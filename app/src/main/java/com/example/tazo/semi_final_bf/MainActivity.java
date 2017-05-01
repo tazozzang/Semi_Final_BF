@@ -140,12 +140,11 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                 Telephony.Sms.PERSON, // 보낸 사람 ID
                 Telephony.Sms.BODY, // 본문
                 Telephony.Sms.SUBJECT, // 제목
-                Telephony.Sms.SUBSCRIPTION_ID, // 속한 구독
+                //Telephony.Sms.SUBSCRIPTION_ID, // 속한 구독
                 Telephony.Sms.READ // 읽었니
 
         };
-        Cursor c ;
-        c = getContentResolver().query(Uri.parse("content://sms"), columns, null, null,"date DESC");
+        Cursor c = getContentResolver().query(Uri.parse("content://sms"), columns, null, null,"date DESC");
         return c;
     }
 
@@ -161,8 +160,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                 CallLog.Calls.IS_READ
                 // 안 읽은 것은 0 읽은 것은 1
         };
-        Cursor c;
-        c = getContentResolver().query(Uri.parse("content://call_log/calls"),
+        Cursor c = getContentResolver().query(Uri.parse("content://call_log/calls"),
                 columns, null, null, "Calls._ID DESC");
 
         return c;
@@ -248,7 +246,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 //            ccc.setText(cursor.getString(2)+", "+ cursor.getString(3));
 //            //cursor.getString(3)이 null 일 때 다른 진동 주기 / 또는 반대
 //            ddd.setText(cursor.getString(4)+", "+ cursor.getString(7));
-            if(cursor.getString(7).equals("0")){
+            if(cursor.getString(6).equals("0")){
                 //Toast.makeText(this,"안읽은문자있음",Toast.LENGTH_LONG).show();
 
                 if(cursor.getString(3) != null){
