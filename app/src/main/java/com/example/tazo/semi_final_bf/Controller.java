@@ -2,6 +2,7 @@ package com.example.tazo.semi_final_bf;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
@@ -31,6 +32,12 @@ public class Controller {
     String icon3;
     String icon4;
     String icon5;
+
+    String icon1Name;
+    String icon2Name;
+    String icon3Name;
+    String icon4Name;
+    String icon5Name;
 
     int controllernum;
 
@@ -68,6 +75,12 @@ public class Controller {
         icon3 = setIcon(3);
         icon4 = setIcon(4);
         icon5 = setIcon(5);
+
+        icon1Name = getIconName(1);
+        icon2Name = getIconName(2);
+        icon3Name= getIconName(3);
+        icon4Name = getIconName(4);
+        icon5Name = getIconName(5);
     }
 
     public void flaggingIcon(int pnum) {
@@ -126,6 +139,12 @@ public class Controller {
             startPointX = e.getX();
             startPointY = e.getY();
             first = false;
+
+            icon1Name = getIconName(1);
+            icon2Name = getIconName(2);
+            icon3Name= getIconName(3);
+            icon4Name = getIconName(4);
+            icon5Name = getIconName(5);
         }
         longClickHandler.postDelayed(longClickRunnable, LONG_PRESS_TIME);
     }
@@ -185,6 +204,23 @@ public class Controller {
         }else {
             return null;
         }
+    }
+
+    String getIconName(int inum) {
+        DB_Handler db_handler = new DB_Handler(context, null, null, 1);
+        DB_Controller db_Controller = db_handler.findIcon(controllernum,inum);
+        if(db_Controller != null) {
+            try {
+                String name
+                        = (String) context.getPackageManager()
+                        .getApplicationLabel(context.getPackageManager()
+                                .getApplicationInfo(db_Controller.getPname(), PackageManager.GET_UNINSTALLED_PACKAGES));
+                return name;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
 }

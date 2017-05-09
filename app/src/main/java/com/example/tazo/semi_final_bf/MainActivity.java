@@ -540,6 +540,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             // 아이콘이 설정된 것이 없으면 진동도 안울리게 했음.
             v.vibrate(100);
             controllers[currentController].flaggingIcon(0);
+            tts.speak(controllers[currentController].icon1Name,TextToSpeech.QUEUE_FLUSH, null);
             //}
         }
         if (theta <= 120 && theta >= 120 - 5) {
@@ -547,6 +548,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
             v.vibrate(100);
             controllers[currentController].flaggingIcon(1);
+            tts.speak(controllers[currentController].icon2Name,TextToSpeech.QUEUE_FLUSH, null);
             //}
         }
         // 세번째 앱 : 카카오톡을 해보자~
@@ -554,6 +556,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             //if(controllers[currentController].icon3 != null) {
             v.vibrate(100);
             controllers[currentController].flaggingIcon(2);
+            tts.speak(controllers[currentController].icon3Name,TextToSpeech.QUEUE_FLUSH, null);
             //}
         }
         // 네번째 앱 : 인터넷을 해보자
@@ -561,6 +564,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             //if(controllers[currentController].icon4 != null) {
             v.vibrate(100);
             controllers[currentController].flaggingIcon(3);
+            tts.speak(controllers[currentController].icon4Name,TextToSpeech.QUEUE_FLUSH, null);
             //}
         }
         // 다섯번째 앱 : 포켓몬 고를 해보자~
@@ -568,6 +572,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             //if(controllers[currentController].icon5 != null) {
             v.vibrate(100);
             controllers[currentController].flaggingIcon(4);
+            tts.speak(controllers[currentController].icon5Name,TextToSpeech.QUEUE_FLUSH, null);
             //}
         }
     }
