@@ -116,4 +116,27 @@ public class DB_Handler extends SQLiteOpenHelper{
         return  false;
     }
 
+    public int howManyController() {
+
+        String query2 = "select * from " + DATABASE_TABLE + " where " + COLUMN_CONTROLLER_NUM + " = " + 2;
+        String query3 = "select * from " + DATABASE_TABLE + " where "+COLUMN_CONTROLLER_NUM+" = "+3;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query3, null);
+        if (cursor.moveToFirst()) {
+            cursor.close();
+            db.close();
+            return 3;
+        }
+        else {
+            cursor = db.rawQuery(query2, null);
+            if(cursor.moveToFirst()) {
+                cursor.close();
+                db.close();
+                return 2;
+            }
+        }
+        return 1;
+    }
+
 }
