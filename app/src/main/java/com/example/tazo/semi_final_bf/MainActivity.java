@@ -348,7 +348,6 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             builder.setContentTitle(name + " 전화, 문자 왔다");
             builder.setContentText("읽어라");
 
-
             if(sms && cal){
                 // 둘 다 등록
                 builder.setVibrate(pattern5);
@@ -389,11 +388,11 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             case MotionEvent.ACTION_DOWN:
                 if(e.getPointerCount() == 1) {
                     controllers[currentController].actionDown(e);
+                    mode = none;
                 }
                 break;
             case MotionEvent.ACTION_UP:
                 if(e.getPointerCount() == 1) {
-                    mode = none;
                     clickCount++;
 
                     Handler handler = new Handler();
@@ -402,8 +401,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                         handler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                if(mode == none && clickCount == 1
-                                        ) {
+                                if(clickCount == 1 && mode != swipe) {
                                     controllers[currentController].actionUp();
                                     clickCount = 0;
                                 }
@@ -462,6 +460,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                                 v.vibrate(cpattern3,-1);
                             }
                         }
+                        tts.speak(String.valueOf(currentController+1)+"번 컨트롤러", TextToSpeech.QUEUE_FLUSH, null);
                     }
                     // left to right swipe (왼쪽)
                     else if (stopX - startX > SWIPE_MIN_DISTANCE && Math.abs(stopX - startX) > SWIPE_THRESHOLD_VELOCITY) {
@@ -479,6 +478,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                                 }
                             }
                         }
+                        tts.speak(String.valueOf(currentController+1)+"번 컨트롤러", TextToSpeech.QUEUE_FLUSH, null);
                     }
                     // down to up swipe
                     else if (startY - stopY > SWIPE_MIN_DISTANCE && Math.abs(startY - stopY) > SWIPE_THRESHOLD_VELOCITY) {
@@ -499,6 +499,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                         startActivity(intent);
                     }
                 }
+                mode = none;
                 break;
             case MotionEvent.ACTION_MOVE:
                 if(e.getPointerCount() == 2) {
@@ -516,7 +517,6 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     }
 
     public void calculate_theta(MotionEvent e) {
-        mode = none;
         tx = e.getX();
         ty = e.getY();
 
@@ -538,7 +538,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         if (theta <= 60 && theta >= 60 - 5) {
             //if(controllers[currentController].icon1 != null) {
             // 아이콘이 설정된 것이 없으면 진동도 안울리게 했음.
-            v.vibrate(100);
+            v.vibrate(150);
             controllers[currentController].flaggingIcon(0);
             tts.speak(controllers[currentController].icon1Name,TextToSpeech.QUEUE_FLUSH, null);
             //}
@@ -546,7 +546,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         if (theta <= 120 && theta >= 120 - 5) {
             //if(controllers[currentController].icon2 != null) {
 
-            v.vibrate(100);
+            v.vibrate(150);
             controllers[currentController].flaggingIcon(1);
             tts.speak(controllers[currentController].icon2Name,TextToSpeech.QUEUE_FLUSH, null);
             //}
@@ -554,7 +554,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         // 세번째 앱 : 카카오톡을 해보자~
         if (theta <= 180 && theta >= 180 - 5) {
             //if(controllers[currentController].icon3 != null) {
-            v.vibrate(100);
+            v.vibrate(150);
             controllers[currentController].flaggingIcon(2);
             tts.speak(controllers[currentController].icon3Name,TextToSpeech.QUEUE_FLUSH, null);
             //}
@@ -562,7 +562,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         // 네번째 앱 : 인터넷을 해보자
         if (theta <= -120 && theta >= -120 - 5) {
             //if(controllers[currentController].icon4 != null) {
-            v.vibrate(100);
+            v.vibrate(150);
             controllers[currentController].flaggingIcon(3);
             tts.speak(controllers[currentController].icon4Name,TextToSpeech.QUEUE_FLUSH, null);
             //}
@@ -570,7 +570,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         // 다섯번째 앱 : 포켓몬 고를 해보자~
         if (theta <= -60 && theta >= -60 - 5) {
             //if(controllers[currentController].icon5 != null) {
-            v.vibrate(100);
+            v.vibrate(150);
             controllers[currentController].flaggingIcon(4);
             tts.speak(controllers[currentController].icon5Name,TextToSpeech.QUEUE_FLUSH, null);
             //}
