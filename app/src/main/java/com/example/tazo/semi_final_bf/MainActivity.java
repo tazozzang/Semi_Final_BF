@@ -40,7 +40,6 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     int controllerNum = 1;
 
     private static final int SWIPE_MIN_DISTANCE = 120;
-    private static final int SWIPE_MAX_OFF_PATH = 250;
     private static final int SWIPE_THRESHOLD_VELOCITY = 200;
 
     // Two Finger Swipe
@@ -50,9 +49,6 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     float startX, startY, stopX, stopY;
 
     // Double Tap
-    final long double_click_time_delta = 350;
-    long lastClickTime = 0;
-    int doubleTap = 2;
     int clickCount = 0;
 
     //TTS
@@ -72,8 +68,6 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     PackageManager pm;
 
     long startTime;
-    long duration;
-    static final int MAX_DURATION = 500;
     final long[] pattern_ms = {
             9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16,
             9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16,
@@ -153,11 +147,6 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
         context = getApplicationContext();
 
-        currentController = 0;
-        controllers[0] = new Controller(context,1);
-        center_x = controllers[currentController].centerX;
-        center_y = controllers[currentController].centerY;
-
         tts = new TextToSpeech(this, this);
         tts.setLanguage(Locale.KOREA);
 
@@ -165,6 +154,13 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
         // DB
         db_handler = DB_Handler.open(this);
+        currentController = 0;
+        controllerNum = db_handler.howManyController();
+        for(int i = 0; i < controllerNum; i ++) {
+            controllers[i] = new Controller(context, i+1);
+        }
+        center_x = controllers[currentController].centerX;
+        center_y = controllers[currentController].centerY;
 
         pm = context.getPackageManager();
 
@@ -328,26 +324,16 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             case MotionEvent.ACTION_UP:
                 if(e.getPointerCount() == 1) {
                     clickCount++;
-
-                    Handler handler = new Handler();
                     if(clickCount == 1) {
                         startTime = System.currentTimeMillis();
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                if(clickCount == 1 && mode != swipe) {
-                                    controllers[currentController].actionUp();
-                                    clickCount = 0;
-                                }
-                            }
-                        },200);
+                        controllers[currentController].actionUp();
+                        clickCount = 0;
 
                     }else if(clickCount == 2) {
                         long duration = System.currentTimeMillis() - startTime;
                         if(duration <= 1000) {
                             // Double Tap
                             clickCount = 0;
-                            duration = 0;
 
                             if(controllerNum < 3) {
                                 controllers[controllerNum] = new Controller(getApplicationContext(), controllerNum+1);
@@ -381,7 +367,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                 }
                 break;
             case MotionEvent.ACTION_POINTER_UP:
-                if(e.getPointerCount() == 2 && mode == swipe) {
+                if(e.getPointerCount() == 2) {
                     String alertmsg = "컨트롤러가 없습니다. 생성하려면 더블 탭";
                     // right to left swipe (오른쪽)
                     if (startX - stopX > SWIPE_MIN_DISTANCE && Math.abs(startX - stopX) > SWIPE_THRESHOLD_VELOCITY) {
@@ -422,6 +408,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                         tts.speak(settinmsg, TextToSpeech.QUEUE_FLUSH, null);
                         Intent intent = new Intent(context, CSettingActivity.class);
                         startActivity(intent);
+                        mode = none;
                     }
                     // up to down swipe
                     else if (stopY - startY > SWIPE_MIN_DISTANCE && Math.abs(stopY - startY) > SWIPE_THRESHOLD_VELOCITY) {
@@ -431,9 +418,9 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                         tts.speak(makeAlarm,TextToSpeech.QUEUE_ADD, null);
                         Intent intent = new Intent(context, MakeAlarm.class);
                         startActivity(intent);
+                        mode = none;
                     }
                 }
-                mode = none;
                 break;
             case MotionEvent.ACTION_MOVE:
                 if(e.getPointerCount() == 2) {
@@ -442,9 +429,6 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                 }else {
                     calculate_theta(e);
                 }
-                break;
-            case MotionEvent.ACTION_CANCEL:
-                mode = none;
                 break;
         }
         return true;
