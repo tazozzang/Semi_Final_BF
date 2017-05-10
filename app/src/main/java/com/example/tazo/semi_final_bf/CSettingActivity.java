@@ -24,10 +24,6 @@ import java.util.Locale;
 
 public class CSettingActivity extends Activity implements TextToSpeech.OnInitListener{
     TextToSpeech tts;
-    PackageManager pm;
-    List<ResolveInfo> list;
-    ArrayList<ActivityInfo> applist;
-    ArrayAdapter adapter;
 
     TextView title;
     TextView chosenNum;
@@ -48,6 +44,8 @@ public class CSettingActivity extends Activity implements TextToSpeech.OnInitLis
     int mode = -1;
     int cmode = 0;
     int imode = 1;
+
+    int RESULT_OK = 1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -84,6 +82,20 @@ public class CSettingActivity extends Activity implements TextToSpeech.OnInitLis
         tts.shutdown();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == RESULT_OK) {
+            if(resultCode == Activity.RESULT_OK) {
+                Intent returnIntent = new Intent();
+                returnIntent.putExtra("result",1);
+                setResult(Activity.RESULT_OK, returnIntent);
+                finish();
+            }else {
+                tts.speak("오류 발생!",TextToSpeech.QUEUE_FLUSH,null);
+            }
+        }
+    }
+
     public boolean onTouchEvent(MotionEvent e) {
         switch (e.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
@@ -107,7 +119,7 @@ public class CSettingActivity extends Activity implements TextToSpeech.OnInitLis
                     Intent i = new Intent(this, CSettingApplication.class);
                     i.putExtra("cnum",chosenC);
                     i.putExtra("inum",chosenI);
-                    startActivity(i);
+                    startActivityForResult(i,1);
                 }
                 break;
         }

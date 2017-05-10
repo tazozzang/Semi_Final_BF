@@ -116,10 +116,18 @@ public class CSettingApplication extends Activity implements TextToSpeech.OnInit
                                 nar = "컨트롤러 수정 완료!";
                                 Toast.makeText(getApplicationContext(), nar, Toast.LENGTH_SHORT).show();
                                 onInit(0);
+                                Intent returnIntent = new Intent();
+                                returnIntent.putExtra("result","ok");
+                                setResult(Activity.RESULT_OK, returnIntent);
+                                finish();
                             } else {
                                 nar = "컨트롤러 수정 실패";
                                 Toast.makeText(getApplicationContext(), nar, Toast.LENGTH_SHORT).show();
                                 onInit(0);
+                                Intent returnIntent = new Intent();
+                                returnIntent.putExtra("result","no");
+                                setResult(Activity.RESULT_OK, returnIntent);
+                                finish();
                             }
                         }else {
                             // 아이콘에 설정된 앱이 없었다면 add(insert)
@@ -128,10 +136,18 @@ public class CSettingApplication extends Activity implements TextToSpeech.OnInit
                                 nar = "컨트롤러 수정 완료!";
                                 Toast.makeText(getApplicationContext(), nar, Toast.LENGTH_SHORT).show();
                                 onInit(0);
+                                Intent returnIntent = new Intent();
+                                returnIntent.putExtra("result","ok");
+                                setResult(Activity.RESULT_OK, returnIntent);
+                                finish();
                             }else {
                                 nar = "컨트롤러 수정 실패";
                                 Toast.makeText(getApplicationContext(), nar, Toast.LENGTH_SHORT).show();
                                 onInit(0);
+                                Intent returnIntent = new Intent();
+                                returnIntent.putExtra("result","no");
+                                setResult(Activity.RESULT_OK, returnIntent);
+                                finish();
                             }
                         }
                     }

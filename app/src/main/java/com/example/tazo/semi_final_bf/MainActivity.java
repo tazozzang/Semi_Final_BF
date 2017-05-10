@@ -58,6 +58,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     Vibrator v;
 
     Context context;
+    int REQUEST_CHANGE = 1;
 
     final long[] cpattern3 = new long[]{200,70,100,25,200,50};
 
@@ -312,8 +313,22 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         );
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == REQUEST_CHANGE) {
+            if(resultCode == Activity.RESULT_OK) {
+                // 설정 후, 바로 적용되도록 컨트롤러를 초기화시켜줍니다.
+                controllerNum = db_handler.howManyController();
+                for(int i = 0; i < controllerNum; i ++) {
+                    controllers[i] = new Controller(context, i+1);
+                }
+                mode = none;
+                clickCount = 0;
+            }
+        }
+    }
+
     public boolean onTouchEvent(MotionEvent e) {
-        final MotionEvent ee = e;
         switch (e.getActionMasked() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 if(e.getPointerCount() == 1) {
@@ -324,7 +339,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             case MotionEvent.ACTION_UP:
                 if(e.getPointerCount() == 1) {
                     clickCount++;
-                    if(clickCount == 1) {
+                    if(clickCount == 1 && mode != swipe) {
                         startTime = System.currentTimeMillis();
                         controllers[currentController].actionUp();
                         clickCount = 0;
@@ -407,8 +422,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                         Toast.makeText(context, settinmsg, Toast.LENGTH_SHORT).show();
                         tts.speak(settinmsg, TextToSpeech.QUEUE_FLUSH, null);
                         Intent intent = new Intent(context, CSettingActivity.class);
-                        startActivity(intent);
-                        mode = none;
+                        startActivityForResult(intent,REQUEST_CHANGE);
                     }
                     // up to down swipe
                     else if (stopY - startY > SWIPE_MIN_DISTANCE && Math.abs(stopY - startY) > SWIPE_THRESHOLD_VELOCITY) {
@@ -418,7 +432,6 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                         tts.speak(makeAlarm,TextToSpeech.QUEUE_ADD, null);
                         Intent intent = new Intent(context, MakeAlarm.class);
                         startActivity(intent);
-                        mode = none;
                     }
                 }
                 break;
@@ -431,7 +444,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                 }
                 break;
         }
-        return true;
+        return super.onTouchEvent(e);
     }
 
     public void calculate_theta(MotionEvent e) {
