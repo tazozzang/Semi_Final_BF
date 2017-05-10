@@ -74,56 +74,23 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     long startTime;
     long duration;
     static final int MAX_DURATION = 500;
-    final long[] pattern1 = {
-            300, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9,
-            16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9,
-            16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9
-    };
-    final long[] pattern2 = {
-            16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9,
-            16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9,
-            16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9
-    };
-    final long[] pattern3 = {
-            300, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16,
-            9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16,
-            9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16
-    };
-    final long[] pattern4 = {
+    final long[] pattern_ms = {
             9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16,
             9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16,
             9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16
     };
-    final long[] pattern5 = {
+    final long[] pattern_cll = {
+            0, 200
+    };
+    final long[] pattern_mscl = {
             300, 200,
             0, 200,
             0, 200,
             0, 200
     };
-    final long[] pattern6 = {
-            0, 200
-    };
-    final long[] pattern7 = {
-            16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9,
-            10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
-            9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16,
-            8, 32, 8, 32, 8, 32, 8, 32, 8, 32,
-            7, 60, 7, 60, 7, 60,
-            0, 200
-    };
-    final long[] pattern8 = {
-            0, 200,
-            7, 60, 7, 60, 7, 60,
-            8, 32, 8, 32, 8, 32, 8, 32, 8, 32,
-            9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16,
-            10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
-            16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9,
-    };
-
 
     int CALL_SMS = 0; // 0 둘 다 없음, 1 전화만 , 2 문자만 , 3 전화, 문자
-    boolean call_reg = false; // 전화 저장된 번호 확인 _ default 모르는 번호
-    boolean sms_reg = false;  // 문자 저장된 번호 확인 _ default 모르는 번호
+
     String ADDR_CALL = "모르는 번호";
 
     public final String Scron = "android.intent.action.SCREEN_ON";
@@ -224,12 +191,6 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
             if(cursor.getString(5).equals("3") && cursor.getString(6).equals("0")){
                 //Toast.makeText(this,"안읽은부재중전화있음", Toast.LENGTH_LONG).show();
-
-                if(cursor.getString(1) != null){
-                    //Toast.makeText(this,"누쩨오", Toast.LENGTH_LONG).show();
-                    call_reg = true;
-                }// 아는 사람이에오
-
                 CALL_SMS += 1;
                 //ADDR_CALL = cursor.getString(1);
             }
@@ -246,12 +207,8 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 //            ccc.setText(cursor.getString(2)+", "+ cursor.getString(3));
 //            //cursor.getString(3)이 null 일 때 다른 진동 주기 / 또는 반대
 //            ddd.setText(cursor.getString(4)+", "+ cursor.getString(7));
-            if(cursor.getString(6).equals("0")){
+            if(cursor.getString(6).equals("1")){
                 //Toast.makeText(this,"안읽은문자있음",Toast.LENGTH_LONG).show();
-
-                if(cursor.getString(3) != null){
-                    sms_reg = true;
-                } // 아는 사람이에오
 
                 CALL_SMS += 2;
 
@@ -260,20 +217,20 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             //ccc.setText("NANANA");
         }
         if(CALL_SMS == 1){
-            new NoticeCall(getApplicationContext()).NC(ADDR_CALL, sms_reg);
+            new NoticeCall(getApplicationContext()).NC(ADDR_CALL);
         }
         else if(CALL_SMS == 2){
-            new NoticeSms(getApplicationContext()).NS(call_reg);
+            new NoticeSms(getApplicationContext()).NS();
         }
         else if(CALL_SMS == 3){
-            new NoticeBoth(getApplicationContext()).NB(ADDR_CALL, sms_reg, call_reg);
+            new NoticeBoth(getApplicationContext()).NB(ADDR_CALL);
         }
         return 0;
     }
     public class NoticeCall{
         public Context context;
         public NoticeCall(Context context){this.context = context;}
-        public void NC(String name, boolean cal){
+        public void NC(String name){
 
             Intent intent = new Intent(MainActivity.this, NoticeCall.class);
             PendingIntent sender = PendingIntent.getBroadcast(context,1,intent,PendingIntent.FLAG_UPDATE_CURRENT);
@@ -288,13 +245,8 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             builder.setTicker("전화");
             builder.setContentTitle(name + " 전화 왔다");
             builder.setContentText("읽어라");
+            builder.setVibrate(pattern_cll);
 
-            if(cal){
-                // 전화 번호 등록
-                builder.setVibrate(pattern1);
-            }else{
-                builder.setVibrate(pattern2);
-            }
             //builder.setVibrate(new long[]{0,2000});
             builder.setAutoCancel(true);
             builder.setContentIntent(sender);
@@ -306,7 +258,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     public class NoticeSms{
         public Context context;
         public NoticeSms(Context context){this.context = context;}
-        public void NS(boolean sms){
+        public void NS(){
             NotificationManager notificationManager =
                     (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
             Intent intent = new Intent(MainActivity.this, NoticeSMS.class);
@@ -318,13 +270,8 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             builder.setTicker("문자");
             builder.setContentTitle("문자 왔다");
             builder.setContentText("읽어라");
+            builder.setVibrate(pattern_ms);
 
-            if(sms){
-                // 문자 번호 등록
-                builder.setVibrate(pattern3);
-            }else{
-                builder.setVibrate(pattern4);
-            }
             //builder.setVibrate(new long[]{0,2000});
             builder.setAutoCancel(true);
             builder.setContentIntent(sender);
@@ -337,7 +284,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     public class NoticeBoth{
         public Context context;
         public NoticeBoth(Context context){this.context = context;}
-        public void NB(String name, boolean sms, boolean cal){
+        public void NB(String name){
             NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 
             Notification.Builder builder = new Notification.Builder(context);
@@ -347,20 +294,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             builder.setTicker("문자 전화");
             builder.setContentTitle(name + " 전화, 문자 왔다");
             builder.setContentText("읽어라");
-
-            if(sms && cal){
-                // 둘 다 등록
-                builder.setVibrate(pattern5);
-            }else if(sms && !cal){
-                // 문자만 등록
-                builder.setVibrate(pattern6);
-            }else if(!sms && cal){
-                // 전화만 등록
-                builder.setVibrate(pattern7);
-            }else if(!sms && !cal){
-                // 둘 다 미등록
-                builder.setVibrate(pattern8);
-            }
+            builder.setVibrate(pattern_mscl);
 
             //builder.setVibrate(new long[]{0,2000});
 
@@ -494,7 +428,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                         // --지연아 여기야..!-------------간단 알람 기능
                         String makeAlarm = "알람 만들기 진입합니다.";
                         Toast.makeText(context, "Make Alarm", Toast.LENGTH_SHORT).show();
-                        //tts.speak(makeAlarm,TextToSpeech.QUEUE_ADD, null);
+                        tts.speak(makeAlarm,TextToSpeech.QUEUE_ADD, null);
                         Intent intent = new Intent(context, MakeAlarm.class);
                         startActivity(intent);
                     }
