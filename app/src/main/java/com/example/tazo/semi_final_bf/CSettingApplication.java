@@ -57,7 +57,7 @@ public class CSettingApplication extends Activity implements TextToSpeech.OnInit
 
         textView.setText("컨트롤러 "+cnum+", 아이콘 "+inum);
 
-        nar = "어플리케이션을 선택하세요.";
+        nar = "어플리케이션을 선택하세요."+"볼륨키나 터치를 이용하여 목록을 읽고, 더블탭으로 설정을 완료하세요.";
 
     }
 
@@ -66,16 +66,39 @@ public class CSettingApplication extends Activity implements TextToSpeech.OnInit
         tts.speak(nar,TextToSpeech.QUEUE_FLUSH, null);
     }
 
+    int keyPosition = 0;
+    String keyChosenPName = null;
+    String keyChosenName = null;
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode){
             case KeyEvent.KEYCODE_VOLUME_UP:
+                if(keyPosition <= 0) {
+                    keyPosition = 0;
+                    tts.speak("목록의 처음입니다.", TextToSpeech.QUEUE_FLUSH, null);
+                }else {
+                    keyPosition--;
+                }
 
+                keyChosenPName = list.get(keyPosition).activityInfo.applicationInfo.packageName;
+                keyChosenName = list.get(keyPosition).activityInfo.applicationInfo.loadLabel(pm).toString();
+                tts.speak(String.valueOf(keyChosenName),TextToSpeech.QUEUE_FLUSH,null);
                 return true;
             case KeyEvent.KEYCODE_VOLUME_DOWN:
-                return true;
+                if(keyPosition >= list.size()-1) {
+                    keyPosition = list.size()-1;
+                    tts.speak("목록의 끝입니다.", TextToSpeech.QUEUE_FLUSH, null);
+                }else {
+                    keyPosition++;
+                }
 
+                keyChosenPName = list.get(keyPosition).activityInfo.applicationInfo.packageName;
+                keyChosenName = list.get(keyPosition).activityInfo.applicationInfo.loadLabel(pm).toString();
+                tts.speak(String.valueOf(keyChosenName),TextToSpeech.QUEUE_FLUSH,null);
+                return true;
         }
+
         return super.onKeyDown(keyCode, event);
     }
 
@@ -102,6 +125,8 @@ public class CSettingApplication extends Activity implements TextToSpeech.OnInit
                 tts.speak(name,TextToSpeech.QUEUE_FLUSH, null);
                 final String chosenPname = list.get(position).activityInfo.applicationInfo.packageName;
                 final String chosenName = ((TextView) view).getText().toString();
+
+                tts.speak("컨트롤러 "+cnum+", 아이콘 "+inum+"을 "+chosenName+"으로 바꾸시겠습니까?",TextToSpeech.QUEUE_FLUSH,null);
 
                 AlertDialog.Builder alert_confirm = new AlertDialog.Builder(CSettingApplication.this);
                 alert_confirm.setMessage("컨트롤러 "+cnum+", 아이콘 "+inum+"을 "+chosenName+"으로 바꾸시겠습니까?").setCancelable(false).setPositiveButton("확인", new DialogInterface.OnClickListener() {
@@ -161,8 +186,6 @@ public class CSettingApplication extends Activity implements TextToSpeech.OnInit
                 alert.show();
             }
         });
-
-        nar = "볼륨키로 리스트를 읽어보세요. 두번 탭 하면 선택됩니다.";
         onInit(0);
     }
 }
