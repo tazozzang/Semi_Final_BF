@@ -10,6 +10,7 @@ import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.Nullable;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -22,8 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import in.championswimmer.sfg.lib.SimpleFingerGestures;
+
 /**
- * Created by Tazo on 2017-04-26.
+ * Created by Tazo & Miran on 2017-04-26.
  */
 
 public class CSettingApplication extends Activity implements TextToSpeech.OnInitListener {
@@ -38,6 +41,11 @@ public class CSettingApplication extends Activity implements TextToSpeech.OnInit
     TextView textView;
 
     String nar;
+
+    int keyPosition = -1;
+    String keyChosenPName = null;
+    String keyChosenName = null;
+    SimpleFingerGestures mySfg = new SimpleFingerGestures();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,6 +67,102 @@ public class CSettingApplication extends Activity implements TextToSpeech.OnInit
 
         nar = "어플리케이션을 선택하세요."+"볼륨키나 터치를 이용하여 목록을 읽고, 더블탭으로 설정을 완료하세요.";
 
+        mySfg.setOnFingerGestureListener(new SimpleFingerGestures.OnFingerGestureListener() {
+            @Override
+            public boolean onSwipeUp(int i, long l, double v) {
+                return false;
+            }
+
+            @Override
+            public boolean onSwipeDown(int i, long l, double v) {
+                return false;
+            }
+
+            @Override
+            public boolean onSwipeLeft(int i, long l, double v) {
+                return false;
+            }
+
+            @Override
+            public boolean onSwipeRight(int i, long l, double v) {
+                return false;
+            }
+
+            @Override
+            public boolean onPinch(int i, long l, double v) {
+                return false;
+            }
+
+            @Override
+            public boolean onUnpinch(int i, long l, double v) {
+                return false;
+            }
+
+            @Override
+            public boolean onDoubleTap(int i) {
+                // 고치는중!
+                if(keyPosition != -1) {
+                    // 사용자가 키 버튼을 눌러 목록을 읽고 더블탭을 했다면
+                    AlertDialog.Builder alert_confirm = new AlertDialog.Builder(CSettingApplication.this);
+                    alert_confirm.setMessage("컨트롤러 "+cnum+", 아이콘 "+inum+"을 "+keyChosenName+"으로 바꾸려면 다시 한번 더블탭, 아니라면 한번 터치 하세요.").setCancelable(false).setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            DB_Handler db_handler = new DB_Handler(getApplicationContext(), null, null, 1);
+                            DB_Controller res = db_handler.findIcon(cnum, inum);
+                            if(res.pname != null) {
+                                // 아이콘에 설정된 앱이 있었다면 update
+                                boolean result = db_handler.updateIcon(cnum, inum, keyChosenPName);
+                                if (result) {
+                                    nar = "컨트롤러 수정 완료!";
+                                    Toast.makeText(getApplicationContext(), nar, Toast.LENGTH_SHORT).show();
+                                    onInit(0);
+                                    Intent returnIntent = new Intent();
+                                    returnIntent.putExtra("result","ok");
+                                    setResult(Activity.RESULT_OK, returnIntent);
+                                    finish();
+                                } else {
+                                    nar = "컨트롤러 수정 실패";
+                                    Toast.makeText(getApplicationContext(), nar, Toast.LENGTH_SHORT).show();
+                                    onInit(0);
+                                    Intent returnIntent = new Intent();
+                                    returnIntent.putExtra("result","no");
+                                    setResult(Activity.RESULT_OK, returnIntent);
+                                    finish();
+                                }
+                            }else {
+                                // 아이콘에 설정된 앱이 없었다면 add(insert)
+                                long ress = db_handler.addIcon(cnum, inum, keyChosenPName);
+                                if(ress != -1) {
+                                    nar = "컨트롤러 수정 완료!";
+                                    Toast.makeText(getApplicationContext(), nar, Toast.LENGTH_SHORT).show();
+                                    onInit(0);
+                                    Intent returnIntent = new Intent();
+                                    returnIntent.putExtra("result","ok");
+                                    setResult(Activity.RESULT_OK, returnIntent);
+                                    finish();
+                                }else {
+                                    nar = "컨트롤러 수정 실패";
+                                    Toast.makeText(getApplicationContext(), nar, Toast.LENGTH_SHORT).show();
+                                    onInit(0);
+                                    Intent returnIntent = new Intent();
+                                    returnIntent.putExtra("result","no");
+                                    setResult(Activity.RESULT_OK, returnIntent);
+                                    finish();
+                                }
+                            }
+                        }
+                    }).setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            //No
+                        }
+                    });
+                    AlertDialog alert = alert_confirm.create();
+                    alert.show();
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -66,17 +170,13 @@ public class CSettingApplication extends Activity implements TextToSpeech.OnInit
         tts.speak(nar,TextToSpeech.QUEUE_FLUSH, null);
     }
 
-    int keyPosition = 0;
-    String keyChosenPName = null;
-    String keyChosenName = null;
-
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode){
             case KeyEvent.KEYCODE_VOLUME_UP:
                 if(keyPosition <= 0) {
                     keyPosition = 0;
-                    tts.speak("목록의 처음입니다.", TextToSpeech.QUEUE_FLUSH, null);
+                    tts.speak("목록의 끝입니다.", TextToSpeech.QUEUE_FLUSH, null);
                 }else {
                     keyPosition--;
                 }
@@ -188,4 +288,5 @@ public class CSettingApplication extends Activity implements TextToSpeech.OnInit
         });
         onInit(0);
     }
+
 }
