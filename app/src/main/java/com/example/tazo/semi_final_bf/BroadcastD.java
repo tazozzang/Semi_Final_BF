@@ -17,7 +17,7 @@ public class BroadcastD extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         NotificationManager notificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context,0,new Intent(context,MakeAlarm.class),PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context,0,new Intent(context,MainActivity.class),PendingIntent.FLAG_UPDATE_CURRENT);
         Notification.Builder builder = new Notification.Builder(context);
         builder.setSmallIcon(R.drawable.min).setTicker("HETT").setWhen(System.currentTimeMillis())
                 .setContentTitle("ALARM").setContentText("안마")
