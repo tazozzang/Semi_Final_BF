@@ -15,6 +15,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -106,7 +107,7 @@ public class CSettingApplication extends Activity implements TextToSpeech.OnInit
             @Override
             public boolean onDoubleTap(int i) {
                 if(isFistDoubleTap) {
-                    tts.speak("컨트롤러 " + cnum + ", 아이콘 " + inum + "을 " + keyChosenName + "으로 바꾸시겠습니까? 취소하려면 왼쪽에서 오른쪽으로 터치하세요.", TextToSpeech.QUEUE_FLUSH, null);
+                    tts.speak("컨트롤러 " + cnum + ", 아이콘 " + inum + "을 " + keyChosenName + "으로 바꾸시겠습니까? 맞다면 더블탭을, 아니라면 왼쪽에서 오른쪽으로 터치하세요.", TextToSpeech.QUEUE_FLUSH, null);
 
                     isFistDoubleTap = false;
                 }else {

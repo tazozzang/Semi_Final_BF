@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.view.MotionEvent;
@@ -223,4 +224,32 @@ public class Controller {
         return null;
     }
 
+    Drawable getIconImage(int inum) {
+        String name = getIconName(inum);
+
+        switch (inum) {
+            case 1:
+                name = icon1;
+                break;
+            case 2:
+                name = icon2;
+                break;
+            case 3:
+                name = icon3;
+                break;
+            case 4:
+                name = icon4;
+                break;
+            case 5:
+                name= icon5;
+                break;
+        }
+
+        try {
+            return pm.getApplicationIcon(name);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
