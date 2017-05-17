@@ -14,7 +14,6 @@ import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Vibrator;
 import android.provider.CallLog;
 import android.provider.Telephony;
@@ -204,7 +203,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 //            ccc.setText(cursor.getString(2)+", "+ cursor.getString(3));
 //            //cursor.getString(3)이 null 일 때 다른 진동 주기 / 또는 반대
 //            ddd.setText(cursor.getString(4)+", "+ cursor.getString(7));
-            if(cursor.getString(6).equals("1")){
+            if(cursor.getString(6).equals("0")){
                 //Toast.makeText(this,"안읽은문자있음",Toast.LENGTH_LONG).show();
 
                 CALL_SMS += 2;

@@ -10,24 +10,22 @@ import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+import android.widget.LinearLayout;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import in.championswimmer.sfg.lib.SimpleFingerGestures;
+
 public class MakeAlarm extends AppCompatActivity {
+
+    private SimpleFingerGestures mySfg;
 
     Vibrator vibrator;
     TimePicker timePicker;
     int t_o_d = 0, m = 0;
-    TextView aaa;
-    TextView bbb;
-    TextView ccc;
-    TextView ddd;
-    TextView eee;
-    TextView fff;
-    TextView min;
-    Button button;
+
+    LinearLayout linearLayout;
+
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -37,7 +35,6 @@ public class MakeAlarm extends AppCompatActivity {
                     timePicker.setHour(timePicker.getHour() + 1);
                 }
                 m += 5;
-                min.setText(String.valueOf(m));
                 timePicker.setMinute(timePicker.getMinute() + 5);
                 return true;
             case KeyEvent.KEYCODE_VOLUME_DOWN:
@@ -45,7 +42,6 @@ public class MakeAlarm extends AppCompatActivity {
                     timePicker.setHour(timePicker.getHour() - 1);
                 }
                 m -= 5;
-                min.setText(String.valueOf(m));
                 timePicker.setMinute(timePicker.getMinute() - 5);
                 return true;
         }
@@ -57,35 +53,67 @@ public class MakeAlarm extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_make_alarm);
 
+        linearLayout = (LinearLayout)findViewById(R.id.activity_make_alarm);
+
         vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);;
-        aaa = (TextView) findViewById(R.id.aaa);
-        bbb = (TextView) findViewById(R.id.bbb);
-        ccc = (TextView) findViewById(R.id.ccc);
-        ddd = (TextView) findViewById(R.id.ddd);
-        eee = (TextView) findViewById(R.id.eee);
-        fff = (TextView) findViewById(R.id.fff);
-        min = (TextView) findViewById(R.id.min);
-        button = (Button) findViewById(R.id.alarmbtn);
         timePicker = (TimePicker) findViewById(R.id.timePicker);
 
-        min.setText(String.valueOf(timePicker.getMinute()));
+        mySfg = new SimpleFingerGestures();
+        mySfg.setDebug(true);
+        mySfg.setConsumeTouchEvents(true);
+
 
         timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
             @Override
             public void onTimeChanged(TimePicker timePicker, int hour_of_day, int minute) {
                 t_o_d = hour_of_day;
                 m = minute;
-                min.setText(String.valueOf(m));
             }
         });
 
-        button.setOnClickListener(new View.OnClickListener() {
+        mySfg.setOnFingerGestureListener(new SimpleFingerGestures.OnFingerGestureListener() {
             @Override
-            public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "Make Alarm", Toast.LENGTH_SHORT).show();
-                new AlarmHATT(getApplicationContext()).Alarm(t_o_d, m);
+            public boolean onSwipeUp(int fingers, long gestureDuration, double gestureDistance) {
+                return false;
+            }
+
+            @Override
+            public boolean onSwipeDown(int fingers, long gestureDuration, double gestureDistance) {
+
+                    Toast.makeText(getApplicationContext(), "Make Alarm", Toast.LENGTH_SHORT).show();
+                    new AlarmHATT(getApplicationContext()).Alarm(t_o_d, m);
+                    finish();
+
+                return false;
+            }
+
+            @Override
+            public boolean onSwipeLeft(int fingers, long gestureDuration, double gestureDistance) {
+                return false;
+            }
+
+            @Override
+            public boolean onSwipeRight(int fingers, long gestureDuration, double gestureDistance) {
+                return false;
+            }
+
+            @Override
+            public boolean onPinch(int fingers, long gestureDuration, double gestureDistance) {
+                return false;
+            }
+
+            @Override
+            public boolean onUnpinch(int fingers, long gestureDuration, double gestureDistance) {
+                return false;
+            }
+
+            @Override
+            public boolean onDoubleTap(int fingers) {
+                return false;
             }
         });
+
+        linearLayout.setOnTouchListener(mySfg);
 
     }
     public class AlarmHATT{
@@ -102,5 +130,22 @@ public class MakeAlarm extends AppCompatActivity {
             calendar.set(calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),calendar.get(Calendar.DATE),time_of_day,minute,0);
             alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),sender);
         }
+    }
+
+    public void VibeJjam(View v){
+        final long[] pattern_ms = {
+                9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16,
+                9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16,
+                9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16
+        };
+        final long[] pattern_cll = {
+                0, 200
+        };
+        final long[] pattern_mscl = {
+                300, 200,
+                0, 200,
+                0, 200,
+                0, 200
+        };
     }
 }

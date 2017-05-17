@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" /> <!-- 통화기록 -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.READ_SMS" /> <!-- 문자 -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
@@ -26,7 +27,9 @@
         <activity android:name=".CSettingActivity" />
         <activity android:name=".CSettingApplication" />
         <activity android:name=".MakeAlarm" />
-        <activity android:name=".NoticeSMS"></activity>
+        <receiver android:name=".BroadcastD" />
+        <activity android:name=".NoticeSMS" />
+        <activity android:name=".NoticeCALL"></activity>
     </application>
 
 </manifest>

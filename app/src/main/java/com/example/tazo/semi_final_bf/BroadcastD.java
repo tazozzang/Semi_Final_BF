@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 
 /**
  * Created by Tazo on 2017-04-26.
@@ -14,13 +15,21 @@ import android.content.Intent;
 public class BroadcastD extends BroadcastReceiver {
     String INTENT_ACTION = Intent.ACTION_BOOT_COMPLETED;
 
+
+    private static String getDevice(){
+        try{
+            return (String)Build.class.getField("SERIAL").get(null);
+        }catch (Exception e){
+            return null;
+        }
+    }
     @Override
     public void onReceive(Context context, Intent intent) {
         NotificationManager notificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
         PendingIntent pendingIntent = PendingIntent.getActivity(context,0,new Intent(context,MainActivity.class),PendingIntent.FLAG_UPDATE_CURRENT);
         Notification.Builder builder = new Notification.Builder(context);
         builder.setSmallIcon(R.drawable.min).setTicker("HETT").setWhen(System.currentTimeMillis())
-                .setContentTitle("ALARM").setContentText("안마")
+                .setContentTitle("ALARM").setContentText(getDevice())
                 .setDefaults(Notification.DEFAULT_SOUND)
                 .setVibrate(new long[]{500, 100, 500 ,100})
                 .setContentIntent(pendingIntent).setAutoCancel(true);
