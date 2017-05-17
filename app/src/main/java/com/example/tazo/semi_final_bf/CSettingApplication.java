@@ -15,6 +15,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -66,7 +67,7 @@ public class CSettingApplication extends Activity implements TextToSpeech.OnInit
 
         textView.setText("컨트롤러 "+cnum+", 아이콘 "+inum);
 
-        nar = "어플리케이션을 선택하세요."+"볼륨키나 터치를 이용하여 목록을 읽고, 왼쪽에서 오른쪽으로 터치하여 설정을 완료하세요.";
+        nar = "어플리케이션을 선택하세요."+"볼륨키나 터치를 이용하여 목록을 읽고, 더블 탭하여 설정을 완료하세요.";
 
         mySfg.setOnFingerGestureListener(new SimpleFingerGestures.OnFingerGestureListener() {
             @Override
@@ -86,7 +87,10 @@ public class CSettingApplication extends Activity implements TextToSpeech.OnInit
 
             @Override
             public boolean onSwipeRight(int i, long l, double v) {
-
+                if(!isFistDoubleTap) {
+                    tts.speak("설정이 취소되었습니다.", TextToSpeech.QUEUE_FLUSH, null);
+                    isFistDoubleTap = false;
+                }
                 return false;
             }
 
@@ -103,7 +107,8 @@ public class CSettingApplication extends Activity implements TextToSpeech.OnInit
             @Override
             public boolean onDoubleTap(int i) {
                 if(isFistDoubleTap) {
-                    tts.speak("컨트롤러 " + cnum + ", 아이콘 " + inum + "을 " + keyChosenName + "으로 바꾸시겠습니까?", TextToSpeech.QUEUE_FLUSH, null);
+                    tts.speak("컨트롤러 " + cnum + ", 아이콘 " + inum + "을 " + keyChosenName + "으로 바꾸시겠습니까? 맞다면 더블탭을, 아니라면 왼쪽에서 오른쪽으로 터치하세요.", TextToSpeech.QUEUE_FLUSH, null);
+
                     isFistDoubleTap = false;
                 }else {
                     DB_Handler db_handler = new DB_Handler(getApplicationContext(), null, null, 1);
@@ -129,7 +134,7 @@ public class CSettingApplication extends Activity implements TextToSpeech.OnInit
                                 finish();
                             }
                         }else {
-                            // 아이콘에 설정된 앱이 없었다면 add(insert)
+                            // 아이콘에 설정된 앱이 없었다면 add (insert)
                             long ress = db_handler.addIcon(cnum, inum, keyChosenPName);
                             if(ress != -1) {
                                 nar = "컨트롤러 수정 완료!";

@@ -21,6 +21,7 @@ import android.speech.tts.TextToSpeech;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.MotionEvent;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.util.Locale;
@@ -64,6 +65,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     // DB
     DB_Handler db_handler;
 
+    ImageView appImage;
 
     PackageManager pm;
 
@@ -172,7 +174,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
         CALL_SMS = readLOG();
 
-
+        appImage = (ImageView)findViewById(R.id.app_image);
 
     }
     public int readLOG(){
@@ -337,7 +339,9 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                 break;
             case MotionEvent.ACTION_UP:
                 if(e.getPointerCount() == 1) {
-                    clickCount++;
+                    if(mode != swipe) {
+                        clickCount++;
+                    }
                     if(clickCount == 1 && mode != swipe) {
                         startTime = System.currentTimeMillis();
                         controllers[currentController].actionUp();
@@ -366,7 +370,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                                 v.vibrate(new long[]{200,100,200,100},-1);
                             }
                         }else {
-                            clickCount = 1;
+                            clickCount = 0;
                             startTime = System.currentTimeMillis();
                         }
                         break;
@@ -374,6 +378,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                 }
                 return true;
             case MotionEvent.ACTION_POINTER_DOWN:
+                clickCount = 0;
                 mode = swipe;
                 if(e.getPointerCount() == 2) {
                     startY = e.getY(0);
@@ -381,6 +386,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                 }
                 break;
             case MotionEvent.ACTION_POINTER_UP:
+                clickCount = 0;
                 if(e.getPointerCount() == 2) {
                     String alertmsg = "컨트롤러가 없습니다. 생성하려면 더블 탭";
                     // right to left swipe (오른쪽)
@@ -394,7 +400,14 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                                 v.vibrate(cpattern3,-1);
                             }
                         }
-                        tts.speak(String.valueOf(currentController+1)+"번 컨트롤러", TextToSpeech.QUEUE_FLUSH, null);
+                        int forspeak = currentController+1;
+                        if(forspeak == 1) {
+                            tts.speak("첫번째", TextToSpeech.QUEUE_FLUSH, null);
+                        }else if(forspeak == 2) {
+                            tts.speak("두번째", TextToSpeech.QUEUE_FLUSH, null);
+                        }else if(forspeak == 3) {
+                            tts.speak("세번째", TextToSpeech.QUEUE_FLUSH, null);
+                        }
                     }
                     // left to right swipe (왼쪽)
                     else if (stopX - startX > SWIPE_MIN_DISTANCE && Math.abs(stopX - startX) > SWIPE_THRESHOLD_VELOCITY) {
@@ -412,7 +425,14 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                                 }
                             }
                         }
-                        tts.speak(String.valueOf(currentController+1)+"번 컨트롤러", TextToSpeech.QUEUE_FLUSH, null);
+                        int forspeak = currentController+1;
+                        if(forspeak == 1) {
+                            tts.speak("첫번째", TextToSpeech.QUEUE_FLUSH, null);
+                        }else if(forspeak == 2) {
+                            tts.speak("두번째", TextToSpeech.QUEUE_FLUSH, null);
+                        }else if(forspeak == 3) {
+                            tts.speak("세번째", TextToSpeech.QUEUE_FLUSH, null);
+                        }
                     }
                     // down to up swipe
                     else if (startY - stopY > SWIPE_MIN_DISTANCE && Math.abs(startY - stopY) > SWIPE_THRESHOLD_VELOCITY) {
@@ -470,6 +490,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             // 아이콘이 설정된 것이 없으면 진동도 안울리게 했음.
             v.vibrate(150);
             controllers[currentController].flaggingIcon(0);
+            appImage.setImageDrawable(controllers[currentController].getIconImage(1));
             tts.speak(controllers[currentController].icon1Name,TextToSpeech.QUEUE_FLUSH, null);
             //}
         }
@@ -478,6 +499,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
             v.vibrate(150);
             controllers[currentController].flaggingIcon(1);
+            appImage.setImageDrawable(controllers[currentController].getIconImage(2));
             tts.speak(controllers[currentController].icon2Name,TextToSpeech.QUEUE_FLUSH, null);
             //}
         }
@@ -486,6 +508,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             //if(controllers[currentController].icon3 != null) {
             v.vibrate(150);
             controllers[currentController].flaggingIcon(2);
+            appImage.setImageDrawable(controllers[currentController].getIconImage(3));
             tts.speak(controllers[currentController].icon3Name,TextToSpeech.QUEUE_FLUSH, null);
             //}
         }
@@ -494,6 +517,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             //if(controllers[currentController].icon4 != null) {
             v.vibrate(150);
             controllers[currentController].flaggingIcon(3);
+            appImage.setImageDrawable(controllers[currentController].getIconImage(4));
             tts.speak(controllers[currentController].icon4Name,TextToSpeech.QUEUE_FLUSH, null);
             //}
         }
@@ -502,6 +526,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             //if(controllers[currentController].icon5 != null) {
             v.vibrate(150);
             controllers[currentController].flaggingIcon(4);
+            appImage.setImageDrawable(controllers[currentController].getIconImage(5));
             tts.speak(controllers[currentController].icon5Name,TextToSpeech.QUEUE_FLUSH, null);
             //}
         }
