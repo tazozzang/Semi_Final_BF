@@ -447,7 +447,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                     else if (stopY - startY > SWIPE_MIN_DISTANCE && Math.abs(stopY - startY) > SWIPE_THRESHOLD_VELOCITY) {
                         // --지연아 여기야..!-------------간단 알람 기능
                         String makeAlarm = "알람 만들기 진입합니다.";
-                        Toast.makeText(context, "Make Alarm", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, "Make Alarm", Toast.LENGTH_SHORT).show();
                         tts.speak(makeAlarm,TextToSpeech.QUEUE_ADD, null);
                         Intent intent = new Intent(context, MakeAlarm.class);
                         startActivity(intent);
