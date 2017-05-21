@@ -10,9 +10,9 @@ import android.os.Vibrator;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import java.util.Locale;
 
@@ -31,6 +31,44 @@ public class MakeAlarm extends AppCompatActivity  implements TextToSpeech.OnInit
     TextToSpeech tts;
 
 
+    final long[] pattern_ms = {
+            9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16,
+            9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16,
+            9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16
+    };
+    final long[] pattern_cll = {
+            0, 200
+    };
+    final long[] pattern_mscl = {
+            300, 200,
+            0, 200,
+            0, 200,
+            0, 200
+    };
+
+    final long[] alarm_vib = {500, 1000};
+
+
+    public void showvib(View view){
+        switch (view.getId()){
+            case R.id.viba:
+                vibrator.vibrate(pattern_ms,-1);
+                break;
+            case R.id.vibb:
+                vibrator.vibrate(pattern_cll,-1);
+                break;
+            case R.id.vibc:
+                vibrator.vibrate(pattern_mscl,-1);
+                break;
+            case R.id.vibd:
+                vibrator.vibrate(alarm_vib,0);
+                break;
+            case R.id.cancelvib:
+                vibrator.cancel();
+                break;
+        }
+
+    }
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
@@ -89,7 +127,7 @@ public class MakeAlarm extends AppCompatActivity  implements TextToSpeech.OnInit
             public boolean onSwipeDown(int fingers, long gestureDuration, double gestureDistance) {
                     String setT = m + "분 후에 알람이 울립니다.";
                     tts.speak(setT, TextToSpeech.QUEUE_FLUSH, null);
-                    Toast.makeText(getApplicationContext(), "Make Alarm", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(), setT, Toast .LENGTH_SHORT).show();
                     new AlarmHATT(getApplicationContext()).Alarm(timePicker.getHour(), timePicker.getMinute());
                     finish();
 
