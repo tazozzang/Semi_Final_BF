@@ -75,6 +75,7 @@ GoogleApiClient.OnConnectionFailedListener{
 
     Context context;
     int REQUEST_CHANGE = 1;
+    int REQUEST_RETURN = 2;
 
     final long[] cpattern3 = new long[]{200,70,100,25,200,50};
 
@@ -458,6 +459,7 @@ GoogleApiClient.OnConnectionFailedListener{
         );
     }
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == REQUEST_CHANGE) {
@@ -471,6 +473,12 @@ GoogleApiClient.OnConnectionFailedListener{
                 clickCount = 0;
             }
         }
+        // -- 바꾼 부분 --
+        if(resultCode == REQUEST_RETURN) {
+            tts.speak("메인 화면에 진입하였습니다.",TextToSpeech.QUEUE_FLUSH,null);
+            v.vibrate(cpattern3,-1);
+        }
+        // -- 바꾼 부분
     }
 
     public boolean onTouchEvent(MotionEvent e) {
