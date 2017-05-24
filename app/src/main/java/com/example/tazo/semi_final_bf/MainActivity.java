@@ -14,19 +14,35 @@ import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Vibrator;
 import android.provider.CallLog;
+import android.provider.Settings;
 import android.provider.Telephony;
 import android.speech.tts.TextToSpeech;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.MotionEvent;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Result;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
+
 import java.util.Locale;
 
-public class MainActivity extends Activity implements TextToSpeech.OnInitListener{
+public class MainActivity extends Activity implements TextToSpeech.OnInitListener, GoogleApiClient.ConnectionCallbacks,
+GoogleApiClient.OnConnectionFailedListener{
+
+
+    private GoogleApiClient googleApiClient;
 
     public double sx, sy; // 시작점
     public double tx, ty; // 현재점
@@ -79,15 +95,26 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             0, 200
     };
     final long[] pattern_mscl = {
-            300, 200,
-            0, 200,
-            0, 200,
-            0, 200
+            300, 800
     };
+
+
+    final long[] Know_You = {
+            300, 800
+    };
+    final long[] Dont_Know_You = {
+            0, 200, 200, 200, 200, 200, 200, 200
+    };
+
+
+    int count = 0;
+
+
 
     int CALL_SMS = 0; // 0 둘 다 없음, 1 전화만 , 2 문자만 , 3 전화, 문자
 
     String ADDR_CALL = "모르는 번호";
+    boolean ckKnow = false; // 아는지 모르는지 체크
 
     public final String Scron = "android.intent.action.SCREEN_ON";
     public final String Scroff = "android.intent.action.SCREEN_OFF";
@@ -131,9 +158,30 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        if(!googleApiClient.isConnected())
+            googleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        googleApiClient.disconnect();
+        super.onStop();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        googleApiClient = new GoogleApiClient.Builder(this).addApi(Wearable.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+
+
 
         int CalLogPerCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG);
         int SmsLogPerCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS);
@@ -172,7 +220,11 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         filter.addAction(Scroff);
         registerReceiver(screenOn,filter);
 
-        CALL_SMS = readLOG();
+
+        if(CalLogPerCheck != PackageManager.PERMISSION_DENIED &&
+                SmsLogPerCheck != PackageManager.PERMISSION_DENIED){
+            CALL_SMS = readLOG();
+        }
 
         appImage = (ImageView)findViewById(R.id.app_image);
 
@@ -193,6 +245,15 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                 //ADDR_CALL = cursor.getString(1);
             }
 
+
+            if(cursor.getString(1) != null){
+                ADDR_CALL = cursor.getString(1);
+                ckKnow = true;
+            }else{
+                ADDR_CALL = "모르는 번호";
+                ckKnow = false;
+            }
+
             // 퍼미션 조까
         }else {
            // aaa.setText("NANANA");
@@ -201,37 +262,106 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         cursor = getSmsLog();
         if(cursor != null){
             cursor.moveToFirst();
-//            cursor.getColumnIndex(Telephony.Sms.DATE);
 //            ccc.setText(cursor.getString(2)+", "+ cursor.getString(3));
 //            //cursor.getString(3)이 null 일 때 다른 진동 주기 / 또는 반대
 //            ddd.setText(cursor.getString(4)+", "+ cursor.getString(7));
             if(cursor.getString(6).equals("0")){
-                //Toast.makeText(this,"안읽은문자있음",Toast.LENGTH_LONG).show();
-
                 CALL_SMS += 2;
-
             }
+
+            if(cursor.getString(3) != null) { // 아는 사람
+                ckKnow = true;
+            }else{
+                ckKnow = false;
+            }
+
+
+
         }else {
             //ccc.setText("NANANA");
         }
         if(CALL_SMS == 1){
-            new NoticeCall(getApplicationContext()).NC(ADDR_CALL);
+            new NoticeCall(getApplicationContext()).NC(ADDR_CALL,ckKnow);
         }
         else if(CALL_SMS == 2){
-            new NoticeSms(getApplicationContext()).NS();
+            new NoticeSms(getApplicationContext()).NS(ckKnow);
         }
         else if(CALL_SMS == 3){
-            new NoticeBoth(getApplicationContext()).NB(ADDR_CALL);
+            new NoticeBoth(getApplicationContext()).NB(ADDR_CALL,ckKnow);
         }
         return 0;
     }
+
+
+    //////////////////////////////////////////////////////////////////
+    //// 데이터 통신용
+
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        //Toast.makeText(this,"Connect",Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        //Toast.makeText(this,"Suspend",Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        //Toast.makeText(this,"Fail",Toast.LENGTH_SHORT).show();
+    }
+
+    private  ResultCallback resultCallback = new ResultCallback() {
+        @Override
+        public void onResult(@NonNull Result result) {
+            String resultC = "Sending " + result.getStatus().isSuccess();
+
+            Toast.makeText(getApplicationContext(),resultC,Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    public void onDontVibrate(){
+        PutDataMapRequest dataMapRequest = PutDataMapRequest.create("/DONT_VIBE_PATH");
+        dataMapRequest.getDataMap().putLongArray("dontknow",Dont_Know_You);
+
+        dataMapRequest.getDataMap().putInt("count",count++);
+        PutDataRequest request = dataMapRequest.asPutDataRequest();
+
+        Wearable.DataApi.putDataItem(googleApiClient,request).setResultCallback(resultCallback);
+        Toast.makeText(getApplicationContext(),"No보내숑",Toast.LENGTH_SHORT).show();
+    }
+
+    public void onKnowVibrate(){
+        PutDataMapRequest dataMapRequest = PutDataMapRequest.create("/KNOW_VIBE_PATH");
+        dataMapRequest.getDataMap().putLongArray("know",Know_You);
+
+        dataMapRequest.getDataMap().putInt("count",count++);
+        PutDataRequest request = dataMapRequest.asPutDataRequest();
+
+        Wearable.DataApi.putDataItem(googleApiClient,request).setResultCallback(resultCallback);
+        Toast.makeText(getApplicationContext(),"YES보내숑",Toast.LENGTH_SHORT).show();
+    }
+
+
+    /////////////////////////////////////////////////////////////////
+
     public class NoticeCall{
         public Context context;
         public NoticeCall(Context context){this.context = context;}
-        public void NC(String name){
+        public void NC(String name , boolean check){
 
-            Intent intent = new Intent(MainActivity.this, NoticeCall.class);
-            PendingIntent sender = PendingIntent.getBroadcast(context,1,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+            if(check){
+                onKnowVibrate();
+            }else{
+                onDontVibrate();
+            }
+
+            Intent calintent = new Intent(Intent.ACTION_VIEW, CallLog.Calls.CONTENT_URI);
+
+            PendingIntent sender =
+                    PendingIntent.getActivity(context,1,calintent,PendingIntent.FLAG_UPDATE_CURRENT);
 
 
             NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
@@ -244,8 +374,6 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             builder.setContentTitle(name + " 전화 왔다");
             builder.setContentText("읽어라");
             builder.setVibrate(pattern_cll);
-
-            //builder.setVibrate(new long[]{0,2000});
             builder.setAutoCancel(true);
             builder.setContentIntent(sender);
 
@@ -256,11 +384,24 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     public class NoticeSms{
         public Context context;
         public NoticeSms(Context context){this.context = context;}
-        public void NS(){
+        public void NS( boolean check){
+
+            if(check){
+                onKnowVibrate();
+            }else{
+                onDontVibrate();
+            }
+
             NotificationManager notificationManager =
                     (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-            Intent intent = new Intent(MainActivity.this, NoticeSMS.class);
-            PendingIntent sender = PendingIntent.getBroadcast(context,1,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+
+            String myphone = Settings.Secure.getString(getContentResolver(), "sms_default_application");
+            PackageManager packageManager = context.getPackageManager();
+            Intent smsintent = packageManager.getLaunchIntentForPackage(myphone);
+
+            PendingIntent sender =
+                    PendingIntent.getActivity(context,1,smsintent,PendingIntent.FLAG_UPDATE_CURRENT);
+
             Notification.Builder builder = new Notification.Builder(context);
             builder.setSmallIcon(R.drawable.min);
             builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),R.drawable.max));
@@ -268,21 +409,27 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             builder.setTicker("문자");
             builder.setContentTitle("문자 왔다");
             builder.setContentText("읽어라");
-            builder.setVibrate(pattern_ms);
-
-            //builder.setVibrate(new long[]{0,2000});
+            //builder.setVibrate(pattern_ms);
             builder.setAutoCancel(true);
             builder.setContentIntent(sender);
 
             Notification notification = builder.build();
             notificationManager.notify(1,notification);
+
         }
     }
 
     public class NoticeBoth{
         public Context context;
         public NoticeBoth(Context context){this.context = context;}
-        public void NB(String name){
+        public void NB(String name , boolean check){
+
+            if(check){
+                onKnowVibrate();
+            }else{
+                onDontVibrate();
+            }
+
             NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 
             Notification.Builder builder = new Notification.Builder(context);
@@ -293,9 +440,6 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             builder.setContentTitle(name + " 전화, 문자 왔다");
             builder.setContentText("읽어라");
             builder.setVibrate(pattern_mscl);
-
-            //builder.setVibrate(new long[]{0,2000});
-
             Notification notification = builder.build();
             notificationManager.notify(1,notification);
         }
@@ -333,6 +477,8 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         switch (e.getActionMasked() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 if(e.getPointerCount() == 1) {
+                    sx = e.getX();
+                    sy = e.getY();
                     controllers[currentController].actionDown(e);
                     mode = none;
                 }
@@ -342,17 +488,23 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                     if(mode != swipe) {
                         clickCount++;
                     }
-                    if(clickCount == 1 && mode != swipe) {
+                    Handler handler = new Handler();
+                    if(clickCount == 1) {
                         startTime = System.currentTimeMillis();
-                        controllers[currentController].actionUp();
-                        clickCount = 0;
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                if(clickCount == 1 && mode != swipe) {
+                                    controllers[currentController].actionUp();
+                                    clickCount = 0;
+                                }
+                            }
+                        },200);
 
                     }else if(clickCount == 2) {
                         long duration = System.currentTimeMillis() - startTime;
                         if(duration <= 1000) {
                             // Double Tap
-                            clickCount = 0;
-
                             if(controllerNum < 3) {
                                 controllers[controllerNum] = new Controller(getApplicationContext(), controllerNum+1);
                                 controllerNum++;
@@ -369,14 +521,15 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                                 tts.speak(warningmsg, TextToSpeech.QUEUE_FLUSH, null);
                                 v.vibrate(new long[]{200,100,200,100},-1);
                             }
-                        }else {
                             clickCount = 0;
+                        }else {
                             startTime = System.currentTimeMillis();
+                            clickCount = 1;
                         }
                         break;
                     }
                 }
-                return true;
+                break;
             case MotionEvent.ACTION_POINTER_DOWN:
                 clickCount = 0;
                 mode = swipe;
@@ -447,7 +600,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                     else if (stopY - startY > SWIPE_MIN_DISTANCE && Math.abs(stopY - startY) > SWIPE_THRESHOLD_VELOCITY) {
                         // --지연아 여기야..!-------------간단 알람 기능
                         String makeAlarm = "알람 만들기 진입합니다.";
-                        //Toast.makeText(context, "Make Alarm", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Make Alarm", Toast.LENGTH_SHORT).show();
                         tts.speak(makeAlarm,TextToSpeech.QUEUE_ADD, null);
                         Intent intent = new Intent(context, MakeAlarm.class);
                         startActivity(intent);
