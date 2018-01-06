@@ -160,10 +160,14 @@ public class Controller {
         Intent intent;
         DB_Handler db_handler = new DB_Handler(context, null, null, 1);
         if(bicon1) {
-            String n = db_handler.findIcon(controllernum,1).getPname();
-            intent = pm.getLaunchIntentForPackage(db_handler.findIcon(controllernum,1).getPname());
-            if (null != intent && n != null) {
-                context.startActivity(intent);
+            if(controllernum == 1) {
+                // !--- 여기에 스팟메모 실행 코드 추가 ---
+            }else {
+                String n = db_handler.findIcon(controllernum, 1).getPname();
+                intent = pm.getLaunchIntentForPackage(db_handler.findIcon(controllernum, 1).getPname());
+                if (null != intent && n != null) {
+                    context.startActivity(intent);
+                }
             }
         }
         if(bicon2) {
@@ -207,24 +211,34 @@ public class Controller {
     }
 
     String getIconName(int inum) {
-        DB_Handler db_handler = new DB_Handler(context, null, null, 1);
-        DB_Controller db_Controller = db_handler.findIcon(controllernum,inum);
-        if(db_Controller != null) {
-            try {
-                String name
-                        = (String) context.getPackageManager()
-                        .getApplicationLabel(context.getPackageManager()
-                                .getApplicationInfo(db_Controller.getPname(), PackageManager.GET_UNINSTALLED_PACKAGES));
-                return name;
-            } catch (Exception e) {
-                e.printStackTrace();
+        if(controllernum == 1 && inum == 1) {
+            return "스팟메모";
+        }else {
+            DB_Handler db_handler = new DB_Handler(context, null, null, 1);
+            DB_Controller db_Controller = db_handler.findIcon(controllernum, inum);
+            if (db_Controller != null) {
+                try {
+                    String name
+                            = (String) context.getPackageManager()
+                            .getApplicationLabel(context.getPackageManager()
+                                    .getApplicationInfo(db_Controller.getPname(), PackageManager.GET_UNINSTALLED_PACKAGES));
+                    return name;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
+            return null;
         }
-        return null;
     }
 
     Drawable getIconImage(int inum) {
         String name = getIconName(inum);
+
+        if(controllernum == 1 && inum == 1) {
+            // 스팟메모 이미지 리턴
+            Drawable drawable = context.getResources().getDrawable(R.drawable.spotmemo);
+            return drawable;
+        }
 
         switch (inum) {
             case 1:
@@ -246,6 +260,7 @@ public class Controller {
 
         try {
             return pm.getApplicationIcon(name);
+
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }

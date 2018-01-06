@@ -243,7 +243,7 @@ GoogleApiClient.OnConnectionFailedListener{
 //                ckKnow = false;
 //            }
 //
-//            // 퍼미션 조까
+//            // 퍼미션 안녕
 //        }else {
 //           // aaa.setText("NANANA");
 //        }
@@ -593,7 +593,7 @@ GoogleApiClient.OnConnectionFailedListener{
                     }
                     // up to down swipe
                     else if (stopY - startY > SWIPE_MIN_DISTANCE && Math.abs(stopY - startY) > SWIPE_THRESHOLD_VELOCITY) {
-                        // --지연아 여기야..!-------------간단 알람 기능
+                        // 간단 알람 기능
                         String makeAlarm = "알람 만들기 진입합니다.";
                         Toast.makeText(context, "Make Alarm", Toast.LENGTH_SHORT).show();
                         tts.speak(makeAlarm,TextToSpeech.QUEUE_ADD, null);
@@ -651,7 +651,7 @@ GoogleApiClient.OnConnectionFailedListener{
             tts.speak(controllers[currentController].icon2Name,TextToSpeech.QUEUE_FLUSH, null);
             //}
         }
-        // 세번째 앱 : 카카오톡을 해보자~
+        // 세번째 앱
         if (theta <= 180 && theta >= 180 - 5) {
             //if(controllers[currentController].icon3 != null) {
             v.vibrate(150);
@@ -660,7 +660,7 @@ GoogleApiClient.OnConnectionFailedListener{
             tts.speak(controllers[currentController].icon3Name,TextToSpeech.QUEUE_FLUSH, null);
             //}
         }
-        // 네번째 앱 : 인터넷을 해보자
+        // 네번째 앱
         if (theta <= -120 && theta >= -120 - 5) {
             //if(controllers[currentController].icon4 != null) {
             v.vibrate(150);
@@ -669,7 +669,7 @@ GoogleApiClient.OnConnectionFailedListener{
             tts.speak(controllers[currentController].icon4Name,TextToSpeech.QUEUE_FLUSH, null);
             //}
         }
-        // 다섯번째 앱 : 포켓몬 고를 해보자~
+        // 다섯번째 앱
         if (theta <= -60 && theta >= -60 - 5) {
             //if(controllers[currentController].icon5 != null) {
             v.vibrate(150);

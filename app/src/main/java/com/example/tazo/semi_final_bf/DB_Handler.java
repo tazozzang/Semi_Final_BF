@@ -34,6 +34,8 @@ public class DB_Handler extends SQLiteOpenHelper{
                 +COLUMN_ICON_NUM + " integer,"
                 +COLUMN_PACKAGE_NAME+" text)";
         db.execSQL(CREATE_TABLE);
+
+        addIcon(1,1,"spotmemo");
     }
 
     @Override
