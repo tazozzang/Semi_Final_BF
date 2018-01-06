@@ -31,7 +31,7 @@ public class BroadcastD extends BroadcastReceiver {
         builder.setSmallIcon(R.drawable.min).setTicker("HETT").setWhen(System.currentTimeMillis())
                 .setContentTitle("ALARM").setContentText(getDevice())
                 .setDefaults(Notification.DEFAULT_SOUND)
-                .setVibrate(new long[]{500, 100, 500 ,100})
+                .setVibrate(new long[]{500, 1000, 500, 1000, 500, 1000, 500, 1000, 500, 1000})
                 .setContentIntent(pendingIntent).setAutoCancel(true);
 
         notificationManager.notify(1,builder.build());

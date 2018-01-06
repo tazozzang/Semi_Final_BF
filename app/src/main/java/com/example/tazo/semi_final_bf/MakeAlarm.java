@@ -8,19 +8,33 @@ import android.icu.util.Calendar;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.speech.tts.TextToSpeech;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TimePicker;
+import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Result;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
 
 import java.util.Locale;
 
 import in.championswimmer.sfg.lib.SimpleFingerGestures;
 
-public class MakeAlarm extends AppCompatActivity  implements TextToSpeech.OnInitListener{
+public class MakeAlarm extends AppCompatActivity  implements TextToSpeech.OnInitListener, GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener{
 
     private SimpleFingerGestures mySfg;
+
+    private GoogleApiClient googleApiClient;
 
     Vibrator vibrator;
     TimePicker timePicker;
@@ -31,19 +45,23 @@ public class MakeAlarm extends AppCompatActivity  implements TextToSpeech.OnInit
     TextToSpeech tts;
 
 
+    final long[] Know_You = {
+            500, 800
+    };
+    final long[] Dont_Know_You = {
+            500, 200, 200, 200, 200, 200, 200
+    };
+    int count = 0;
+
+
     final long[] pattern_ms = {
-            9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16,
-            9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16,
-            9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16, 9, 16
+            50,70,100,150,500,70,100,150,500
     };
     final long[] pattern_cll = {
             0, 200
     };
     final long[] pattern_mscl = {
-            300, 200,
-            0, 200,
-            0, 200,
-            0, 200
+            0, 800
     };
 
     final long[] alarm_vib = {500, 1000};
@@ -52,52 +70,168 @@ public class MakeAlarm extends AppCompatActivity  implements TextToSpeech.OnInit
     public void showvib(View view){
         switch (view.getId()){
             case R.id.viba:
+                onDontVibrate();
                 vibrator.vibrate(pattern_ms,-1);
                 break;
             case R.id.vibb:
+                onDontVibrate();
                 vibrator.vibrate(pattern_cll,-1);
                 break;
             case R.id.vibc:
+                onDontVibrate();
                 vibrator.vibrate(pattern_mscl,-1);
                 break;
+
+            case R.id.vibe:
+                onKnowVibrate();
+                vibrator.vibrate(pattern_ms,-1);
+                break;
+            case R.id.vibf:
+                onKnowVibrate();
+                vibrator.vibrate(pattern_cll,-1);
+                break;
+            case R.id.vibg:
+                onKnowVibrate();
+                vibrator.vibrate(pattern_mscl,-1);
+                break;
+
+
             case R.id.vibd:
+                onGiveAlarm();
                 vibrator.vibrate(alarm_vib,0);
                 break;
             case R.id.cancelvib:
+                onGiveCancel();
                 vibrator.cancel();
                 break;
         }
 
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if(!googleApiClient.isConnected())
+            googleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        googleApiClient.disconnect();
+        super.onStop();
+    }
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_UP:
-                if(timePicker.getMinute() >= 55){
-                    timePicker.setHour(timePicker.getHour() + 1);
+                if(timePicker.getCurrentMinute() >= 55){
+                    timePicker.setHour(timePicker.getCurrentHour() + 1);
                 }
                 m += 5;
                 String plus = m + "분 추가";
                 //Toast.makeText(getApplicationContext(), warningmsg,Toast.LENGTH_SHORT).show();
                 tts.speak(plus, TextToSpeech.QUEUE_FLUSH, null);
-                timePicker.setMinute(timePicker.getMinute() + 5);
+                timePicker.setMinute(timePicker.getCurrentMinute() + 5);
                 return true;
             case KeyEvent.KEYCODE_VOLUME_DOWN:
-                if(timePicker.getMinute() <= 4){
-                    timePicker.setHour(timePicker.getHour() - 1);
+                if(timePicker.getCurrentMinute() <= 4){
+                    timePicker.setHour(timePicker.getCurrentHour() - 1);
                 }
                 m -= 5;
                 String minus = m + "분 감소";
                 tts.speak(minus, TextToSpeech.QUEUE_FLUSH, null);
-                timePicker.setMinute(timePicker.getMinute() - 5);
+                timePicker.setMinute(timePicker.getCurrentMinute() - 5);
                 return true;
         }
         return super.onKeyDown(keyCode, event);
     }
 
+    //////////////////////////////////////////////////////////////////
+    //// 데이터 통신용
+
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        //Toast.makeText(this,"Connect",Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        //Toast.makeText(this,"Suspend",Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        //Toast.makeText(this,"Fail",Toast.LENGTH_SHORT).show();
+    }
+
+    private ResultCallback resultCallback = new ResultCallback() {
+        @Override
+        public void onResult(@NonNull Result result) {
+            String resultC = "Sending " + result.getStatus().isSuccess();
+
+            Toast.makeText(getApplicationContext(),resultC,Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    public void onDontVibrate(){
+        PutDataMapRequest dataMapRequest = PutDataMapRequest.create("/DONT_VIBE_PATH");
+        dataMapRequest.getDataMap().putLongArray("dontknow",Dont_Know_You);
+
+        dataMapRequest.getDataMap().putInt("count",count++);
+        PutDataRequest request = dataMapRequest.asPutDataRequest();
+
+        Wearable.DataApi.putDataItem(googleApiClient,request).setResultCallback(resultCallback);
+        //Toast.makeText(getApplicationContext(),"No보내숑",Toast.LENGTH_SHORT).show();
+    }
+
+    public void onKnowVibrate(){
+        PutDataMapRequest dataMapRequest = PutDataMapRequest.create("/KNOW_VIBE_PATH");
+        dataMapRequest.getDataMap().putLongArray("know",Know_You);
+
+        dataMapRequest.getDataMap().putInt("count",count++);
+        PutDataRequest request = dataMapRequest.asPutDataRequest();
+
+        Wearable.DataApi.putDataItem(googleApiClient,request).setResultCallback(resultCallback);
+        //Toast.makeText(getApplicationContext(),"YES보내숑",Toast.LENGTH_SHORT).show();
+    }
+
+    public void onGiveAlarm(){
+        PutDataMapRequest dataMapRequest = PutDataMapRequest.create("/GIVE_ALARM");
+        dataMapRequest.getDataMap().putLongArray("alarm",alarm_vib);
+
+        dataMapRequest.getDataMap().putInt("count",count++);
+        PutDataRequest request = dataMapRequest.asPutDataRequest();
+
+        Wearable.DataApi.putDataItem(googleApiClient,request).setResultCallback(resultCallback);
+        //Toast.makeText(getApplicationContext(),"알람보내숑",Toast.LENGTH_SHORT).show();
+    }
+
+    public void onGiveCancel(){
+        PutDataMapRequest dataMapRequest = PutDataMapRequest.create("/STOP_ALARM");
+
+        dataMapRequest.getDataMap().putInt("count",count++);
+        PutDataRequest request = dataMapRequest.asPutDataRequest();
+
+        Wearable.DataApi.putDataItem(googleApiClient,request).setResultCallback(resultCallback);
+        //Toast.makeText(getApplicationContext(),"알람죽여",Toast.LENGTH_SHORT).show();
+    }
+
+    /////////////////////////////////////////////////////////////////
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        googleApiClient = new GoogleApiClient.Builder(this).addApi(Wearable.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+
+
         setContentView(R.layout.activity_make_alarm);
         tts = new TextToSpeech(this,this);
         tts.setLanguage(Locale.KOREA);
@@ -128,7 +262,7 @@ public class MakeAlarm extends AppCompatActivity  implements TextToSpeech.OnInit
                     String setT = m + "분 후에 알람이 울립니다.";
                     tts.speak(setT, TextToSpeech.QUEUE_FLUSH, null);
                     //Toast.makeText(getApplicationContext(), setT, Toast .LENGTH_SHORT).show();
-                    new AlarmHATT(getApplicationContext()).Alarm(timePicker.getHour(), timePicker.getMinute());
+                    new AlarmHATT(getApplicationContext()).Alarm(timePicker.getCurrentHour(), timePicker.getCurrentMinute());
                     finish();
 
                 return false;
@@ -166,7 +300,7 @@ public class MakeAlarm extends AppCompatActivity  implements TextToSpeech.OnInit
 
     @Override
     public void onInit(int i) {
-        String telling= "현재 시각" + timePicker.getHour() +"시 " + timePicker.getMinute()+"분입니다.";
+        String telling= "현재 시각" + timePicker.getCurrentHour() +"시 " + timePicker.getCurrentMinute()+"분입니다.";
         tts.speak(telling, TextToSpeech.QUEUE_FLUSH, null);
     }
 
