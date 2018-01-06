@@ -2,7 +2,6 @@ package com.example.tazo.semi_final_bf;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
@@ -143,7 +142,7 @@ public class Controller {
 
             icon1Name = getIconName(1);
             icon2Name = getIconName(2);
-            icon3Name= getIconName(3);
+            icon3Name = getIconName(3);
             icon4Name = getIconName(4);
             icon5Name = getIconName(5);
         }
