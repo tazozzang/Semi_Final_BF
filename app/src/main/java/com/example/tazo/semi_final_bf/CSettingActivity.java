@@ -151,10 +151,15 @@ public class CSettingActivity extends Activity implements TextToSpeech.OnInitLis
                         start = "설정을 취소합니다. 메인 화면으로 돌아갑니다.";
                         onInit(1);
                     }else {
-                        Intent i = new Intent(this, CSettingApplication.class);
-                        i.putExtra("cnum", chosenC);
-                        i.putExtra("inum", chosenI);
-                        startActivityForResult(i, 1);
+                        if(chosenC == 1 && chosenI == 1) {
+                            start = "해당 위치는 변경할 수 없습니다. 아이콘의 위치를 다시 선택해주세요.";
+                            onInit(1);
+                        }else {
+                            Intent i = new Intent(this, CSettingApplication.class);
+                            i.putExtra("cnum", chosenC);
+                            i.putExtra("inum", chosenI);
+                            startActivityForResult(i, 1);
+                        }
                     }
                 }
                 break;
