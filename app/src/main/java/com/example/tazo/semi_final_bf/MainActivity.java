@@ -200,6 +200,7 @@ GoogleApiClient.OnConnectionFailedListener{
         for(int i = 0; i < controllerNum; i ++) {
             controllers[i] = new Controller(context, i+1);
         }
+        db_handler.addIcon(1,1,"spotmemo");
         center_x = controllers[currentController].centerX;
         center_y = controllers[currentController].centerY;
 
