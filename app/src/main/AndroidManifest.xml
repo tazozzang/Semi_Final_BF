@@ -57,6 +57,7 @@
 
         <receiver android:name=".BroadcastD" />
 
+        <activity android:name=".SettingActivity"></activity>
         <activity android:name=".SM_main"></activity>
     </application>
 

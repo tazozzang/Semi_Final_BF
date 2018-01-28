@@ -594,7 +594,7 @@ GoogleApiClient.OnConnectionFailedListener{
                         String settinmsg = "설정 메뉴로 진입합니다.";
                         Toast.makeText(context, settinmsg, Toast.LENGTH_SHORT).show();
                         tts.speak(settinmsg, TextToSpeech.QUEUE_FLUSH, null);
-                        Intent intent = new Intent(context, CSettingActivity.class);
+                        Intent intent = new Intent(context, SettingActivity.class);
                         startActivityForResult(intent,REQUEST_CHANGE);
                     }
                     // up to down swipe
