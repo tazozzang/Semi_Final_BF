@@ -161,6 +161,9 @@ public class Controller {
         DB_Handler db_handler = new DB_Handler(context, null, null, 1);
         if(bicon1) {
             if(controllernum == 1) {
+                Intent intent1 = new Intent(context, SM_main.class);
+                context.startActivity(intent1);
+
                 // !--- 여기에 스팟메모 실행 코드 추가 ---
             }else {
                 String n = db_handler.findIcon(controllernum, 1).getPname();
