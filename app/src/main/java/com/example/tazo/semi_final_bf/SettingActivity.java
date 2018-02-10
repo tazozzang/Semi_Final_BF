@@ -8,15 +8,19 @@ import android.os.Vibrator;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.support.annotation.Nullable;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.Locale;
+
+import in.championswimmer.sfg.lib.SimpleFingerGestures;
 
 /**
  * Created by Tazo on 2017-04-26.
@@ -29,6 +33,9 @@ public class SettingActivity extends Activity implements TextToSpeech.OnInitList
     ArrayAdapter adapter;
 
     String start;
+
+    int keyPosition = -2;
+    SimpleFingerGestures mySfg = new SimpleFingerGestures();
 
     boolean exit = false;
     int RESULT_OK = 1;
@@ -70,31 +77,86 @@ public class SettingActivity extends Activity implements TextToSpeech.OnInitList
         tts = new TextToSpeech(this, this);
         tts.setLanguage(Locale.KOREA);
 
-        start = "설정 메뉴입니다. 볼륨키나 터치를 이용하여 목록을 읽고, 더블 탭으로 설정을 완료하세요.";
+        start = "볼륨키나 터치를 이용하여 목록을 읽고, 더블 탭으로 메뉴를 선택하세요.";
         onInit(0);
 
-        // 볼륨키로 선택하는 것도 추가하기
-        // 터치도 완성 안됨
+        // ** 볼륨키로 선택하는 것도 추가하기
+        // ** 터치도 완성 안됨
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                start = ((TextView) view).getText().toString();
+                onInit(1);
+
                 switch (position) {
-                    case 1:
+                    case 0:
                         // 설정 취소
+                        // 20180210 : 설정취소 이름을 읽어주지 않는 문제가 있음! 고치기
+                        exit = true;
+                        start = "메인화면으로 돌아갑니다";
+                        onInit(9);
                         break;
-                    case 2:
+                    case 1:
                         // 모드 변경
                         break;
-                    case 3:
+                    case 2:
                         // 컨트롤러 설정
-                        Intent i = new Intent(SettingActivity.this, CSettingActivity.class);
-                        startActivity(i);
+                        Intent c = new Intent(SettingActivity.this, CSettingActivity.class);
+                        startActivity(c);
                         break;
                 }
             }
         });
 
+        mySfg.setOnFingerGestureListener(new SimpleFingerGestures.OnFingerGestureListener() {
+            @Override
+            public boolean onSwipeUp(int i, long l, double v) {
+                return false;
+            }
+
+            @Override
+            public boolean onSwipeDown(int i, long l, double v) {
+                return false;
+            }
+
+            @Override
+            public boolean onSwipeLeft(int i, long l, double v) {
+                return false;
+            }
+
+            @Override
+            public boolean onSwipeRight(int i, long l, double v) {
+                return false;
+            }
+
+            @Override
+            public boolean onPinch(int i, long l, double v) {
+                return false;
+            }
+
+            @Override
+            public boolean onUnpinch(int i, long l, double v) {
+                return false;
+            }
+
+            @Override
+            public boolean onDoubleTap(int i) {
+                if (keyPosition == 0) {
+                    // 0 : 설정 취소
+
+                } else if (keyPosition == 1) {
+                    // 1 : 모드 변경
+
+                } else {
+                    // 2 : 컨트롤러 설정
+                    Intent c = new Intent(SettingActivity.this, CSettingActivity.class);
+                    startActivity(c);
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -103,9 +165,16 @@ public class SettingActivity extends Activity implements TextToSpeech.OnInitList
         HashMap<String, String> params = new HashMap<String, String>();
         params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID,"stringId");
         tts.speak(start,TextToSpeech.QUEUE_FLUSH, params);
-
         //QUEUE_FLUSH는 큐에 모든 값을 없애고 초기화한 후 값을 넣는 옵션
         //QUEUE_ADD는 현재 있는 큐값에 추가하는 옵션
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        listView.setOnTouchListener(mySfg);
+        listView.setOnItemClickListener(null);
+
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override
