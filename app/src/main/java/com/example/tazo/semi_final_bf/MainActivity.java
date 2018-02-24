@@ -173,14 +173,10 @@ GoogleApiClient.OnConnectionFailedListener{
 
 
 
-        int CalLogPerCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG);
-        int SmsLogPerCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS);
+        int PerCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
 
-        if(CalLogPerCheck == PackageManager.PERMISSION_DENIED){
-            perCheck();
-        }
 
-        if(SmsLogPerCheck == PackageManager.PERMISSION_DENIED){
+        if(PerCheck == PackageManager.PERMISSION_DENIED){
             perCheck();
         }
         ////////////////////////////////////////////////////////////// 권한 확인 끝
@@ -436,17 +432,14 @@ GoogleApiClient.OnConnectionFailedListener{
     void perCheck(){
         ActivityCompat.requestPermissions(this,
                 new String[]{
-                        Manifest.permission.READ_CALL_LOG,
-                        Manifest.permission.WRITE_CALL_LOG,
-                        Manifest.permission.READ_LOGS,
                         Manifest.permission.READ_CONTACTS,
                         Manifest.permission.WRITE_CONTACTS,
-                        Manifest.permission.READ_SMS,
                         Manifest.permission.INTERNET,
                         Manifest.permission.ACCESS_NETWORK_STATE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
                         Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.ACCESS_FINE_LOCATION
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.RECORD_AUDIO
                 },
                 0
         );

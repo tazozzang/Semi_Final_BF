@@ -3,11 +3,9 @@
     package="com.example.tazo.semi_final_bf">
 
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.READ_CALL_LOG" /> <!-- 통화기록 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.READ_SMS" /> <!-- 문자 -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <!--
         지도 관련 권한 등록
     -->

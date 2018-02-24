@@ -1,11 +1,17 @@
 package com.example.tazo.semi_final_bf;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -25,11 +31,18 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+
 public class SM_main extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,  GoogleApiClient.OnConnectionFailedListener, PlaceSelectionListener, OnMapReadyCallback {
     PlaceAutocompleteFragment autocompleteFragment;
     MapFragment mapFragment;
     GoogleMap map;
     GoogleApiClient googleApiClient = null;
+
+    Button search_button;
+    SpeechRecognizer recognizer;
+    boolean SSTsted = false;
+    Intent i;
 
     @Override
     protected void onStart() {
@@ -41,6 +54,8 @@ public class SM_main extends AppCompatActivity implements GoogleApiClient.Connec
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sm_main);
+
+        search_button = (Button)findViewById(R.id.search_button);
 
         autocompleteFragment = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_search);
         autocompleteFragment.setOnPlaceSelectedListener(this);
@@ -57,8 +72,88 @@ public class SM_main extends AppCompatActivity implements GoogleApiClient.Connec
                     .addApi(LocationServices.API) //로케이션정보를 얻겠다
                     .build();
         }
-    }
 
+        i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        i.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,getPackageName());
+        i.putExtra(RecognizerIntent.EXTRA_LANGUAGE,"ko-KR");
+
+        recognizer = SpeechRecognizer.createSpeechRecognizer(this);
+        recognizer.setRecognitionListener(listner);
+
+        search_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(SSTsted == false){
+                    recognizer.startListening(i);
+                    //Toast.makeText(view.getContext(),"시작",Toast.LENGTH_LONG).show();
+                    SSTsted = true;
+                    //Toast.makeText(getApplicationContext(), "여기까지 오긴 함1",Toast.LENGTH_SHORT).show();
+
+                }
+                else{
+                    recognizer.stopListening();
+                    SSTsted = false;
+                    //Toast.makeText(getApplicationContext(), "여기까지 오긴 함3",Toast.LENGTH_SHORT).show();
+
+                }
+            }
+        });
+    }
+    private RecognitionListener listner = new RecognitionListener() {
+        @Override
+        public void onReadyForSpeech(Bundle bundle) {
+
+        }
+
+        @Override
+        public void onBeginningOfSpeech() {
+
+        }
+
+        @Override
+        public void onRmsChanged(float v) {
+
+        }
+
+        @Override
+        public void onBufferReceived(byte[] bytes) {
+
+        }
+
+        @Override
+        public void onEndOfSpeech() {
+
+        }
+
+        @Override
+        public void onError(int i) {
+
+        }
+
+        @Override
+        public void onResults(Bundle bundle) {
+            String key = "";
+            key = SpeechRecognizer.RESULTS_RECOGNITION;
+            ArrayList<String> mresult = bundle.getStringArrayList(key);
+            String[] rs = new String[mresult.size()];
+            mresult.toArray(rs);
+
+            //Toast.makeText(getApplicationContext(), rs[0],Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), "여기까지 오긴 함2",Toast.LENGTH_SHORT).show();
+            autocompleteFragment.setText(""+rs[0]);
+
+        }
+
+        @Override
+        public void onPartialResults(Bundle bundle) {
+
+        }
+
+        @Override
+        public void onEvent(int i, Bundle bundle) {
+
+        }
+    };
     @Override
     public void onPlaceSelected(Place place) {
         Toast.makeText(this, place.getName(),

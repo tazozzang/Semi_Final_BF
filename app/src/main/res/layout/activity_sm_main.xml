@@ -8,13 +8,28 @@
     android:id="@+id/sm_main"
     tools:context="com.example.tazo.semi_final_bf.SM_main">
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/search_button"
+        android:text="검색하기"
+        android:textSize="20sp"
+        android:padding="15sp"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/add_button"
+        android:text="메모추가"
+        android:textSize="20sp"
+        android:padding="15sp"/>
+
     <fragment
         android:id="@+id/place_search"
         android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="30dp"/>
+        android:layout_height="50dp"/>
 
     <fragment
         android:id="@+id/map"
@@ -22,4 +37,6 @@
         android:layout_height="300dp"
         android:name="com.google.android.gms.maps.MapFragment"
         />
+
+
 </LinearLayout>
