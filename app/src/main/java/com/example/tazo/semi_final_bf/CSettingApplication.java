@@ -189,17 +189,17 @@ public class CSettingApplication extends Activity implements TextToSpeech.OnInit
         });
     }
 
-    @Override
-    public void onInit(int status) {
-        if(status == 9) {
-            tts.setOnUtteranceProgressListener(listener);
-            HashMap<String, String> params = new HashMap<String, String>();
-            params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID,"stringId");
-            tts.speak(nar,TextToSpeech.QUEUE_FLUSH, params);
-        }else {
-            tts.speak(nar,TextToSpeech.QUEUE_FLUSH,null);
+        @Override
+        public void onInit(int status) {
+            if(status == 9) {
+                tts.setOnUtteranceProgressListener(listener);
+                HashMap<String, String> params = new HashMap<String, String>();
+                params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID,"stringId");
+                tts.speak(nar,TextToSpeech.QUEUE_FLUSH, params);
+            }else {
+                tts.speak(nar,TextToSpeech.QUEUE_FLUSH,null);
+            }
         }
-    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {

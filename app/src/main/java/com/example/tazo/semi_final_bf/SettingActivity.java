@@ -88,15 +88,18 @@ public class SettingActivity extends Activity implements TextToSpeech.OnInitList
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 start = ((TextView) view).getText().toString();
-                onInit(1);
+                onInit(9);
 
                 switch (position) {
                     case 0:
                         // 설정 취소
-                        // 20180210 : 설정취소 이름을 읽어주지 않는 문제가 있음! 고치기
+                        // ** 20180210 : 설정취소 이름을 읽어주지 않는 문제가 있음! 고치기
                         exit = true;
-                        start = "메인화면으로 돌아갑니다";
+                        start = "메인화면으로 돌아갑니다.";
                         onInit(9);
+                        Intent returnIntent = new Intent();
+                        setResult(2,returnIntent);
+                        finish();
                         break;
                     case 1:
                         // 모드 변경
@@ -104,7 +107,7 @@ public class SettingActivity extends Activity implements TextToSpeech.OnInitList
                     case 2:
                         // 컨트롤러 설정
                         Intent c = new Intent(SettingActivity.this, CSettingActivity.class);
-                        startActivity(c);
+                        startActivityForResult(c,2);
                         break;
                 }
             }
@@ -152,7 +155,8 @@ public class SettingActivity extends Activity implements TextToSpeech.OnInitList
                 } else {
                     // 2 : 컨트롤러 설정
                     Intent c = new Intent(SettingActivity.this, CSettingActivity.class);
-                    startActivity(c);
+                    startActivityForResult(c,2);
+                    finish();
                 }
                 return false;
             }
@@ -185,10 +189,10 @@ public class SettingActivity extends Activity implements TextToSpeech.OnInitList
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == RESULT_OK) {
+        if(requestCode == 2) {
+            // 컨트롤러 설정 후 돌아온 곳
             if(resultCode == Activity.RESULT_OK) {
                 Intent returnIntent = new Intent();
-                returnIntent.putExtra("result",1);
                 setResult(Activity.RESULT_OK, returnIntent);
                 finish();
             }else if(resultCode == 2) {

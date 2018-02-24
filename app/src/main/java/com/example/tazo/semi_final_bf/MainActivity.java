@@ -457,6 +457,9 @@ GoogleApiClient.OnConnectionFailedListener{
                 }
                 mode = none;
                 clickCount = 0;
+
+                tts.speak("메인 화면에 진입하였습니다.",TextToSpeech.QUEUE_FLUSH,null);
+                v.vibrate(cpattern3,-1);
             }
         }
         // -- 바꾼 부분 --

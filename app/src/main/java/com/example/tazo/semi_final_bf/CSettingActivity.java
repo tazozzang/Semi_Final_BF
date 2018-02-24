@@ -158,7 +158,7 @@ public class CSettingActivity extends Activity implements TextToSpeech.OnInitLis
                             Intent i = new Intent(this, CSettingApplication.class);
                             i.putExtra("cnum", chosenC);
                             i.putExtra("inum", chosenI);
-                            startActivityForResult(i, 1);
+                            startActivityForResult(i, RESULT_OK);
                         }
                     }
                 }
