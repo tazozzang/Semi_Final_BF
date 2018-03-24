@@ -93,13 +93,7 @@ public class SettingActivity extends Activity implements TextToSpeech.OnInitList
                 switch (position) {
                     case 0:
                         // 설정 취소
-                        // ** 20180210 : 설정취소 이름을 읽어주지 않는 문제가 있음! 고치기
                         exit = true;
-                        start = "메인화면으로 돌아갑니다.";
-                        onInit(9);
-                        Intent returnIntent = new Intent();
-                        setResult(2,returnIntent);
-                        finish();
                         break;
                     case 1:
                         // 모드 변경
