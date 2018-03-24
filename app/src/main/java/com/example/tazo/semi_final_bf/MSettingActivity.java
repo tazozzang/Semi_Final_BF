@@ -1,33 +1,24 @@
 package com.example.tazo.semi_final_bf;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Vibrator;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.support.annotation.Nullable;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Set;
 
 import in.championswimmer.sfg.lib.SimpleFingerGestures;
 
-/**
- * Created by Tazo on 2017-04-26.
- */
-
-public class SettingActivity extends Activity implements TextToSpeech.OnInitListener {
+public class MSettingActivity extends Activity implements TextToSpeech.OnInitListener {
     TextToSpeech tts;
 
     ListView listView;
@@ -66,19 +57,19 @@ public class SettingActivity extends Activity implements TextToSpeech.OnInitList
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_setting);
+        setContentView(R.layout.activity_msetting);
 
         listView = (ListView)findViewById(R.id.setting_listview);
         adapter = new ArrayAdapter(getApplicationContext(), R.layout.row);
-        adapter.add("설정 취소");
-        adapter.add("모드 변경");
-        adapter.add("컨트롤러 설정");
+        adapter.add("컨트롤러 모드");
+        adapter.add("바둑판 모드");
+        adapter.add("자동롤링 모드");
         listView.setAdapter(adapter);
 
         tts = new TextToSpeech(this, this);
         tts.setLanguage(Locale.KOREA);
 
-        start = "볼륨키나 터치를 이용하여 목록을 읽고, 더블 탭으로 메뉴를 선택하세요.";
+        start = "모드 변경 페이지 입니다. 볼륨키나 터치를 이용하여 목록을 읽고, 더블 탭으로 모드를 선택하세요.";
         onInit(0);
 
         // ** 볼륨키로 선택하는 것도 추가하기
@@ -93,16 +84,18 @@ public class SettingActivity extends Activity implements TextToSpeech.OnInitList
 
                 switch (position) {
                     case 0:
-                        // 설정 취소
-                        exit = true;
+                        // 컨트롤러 모드
+                        Intent returnIntent = new Intent();
+                        returnIntent.putExtra("result", "ok");
+                        setResult(Activity.RESULT_OK, returnIntent);
+                        finish();
                         break;
                     case 1:
                         // 모드 변경
-                        startActivityForResult(new Intent(SettingActivity.this, MSettingActivity.class), 4);
                         break;
                     case 2:
                         // 컨트롤러 설정
-                        Intent c = new Intent(SettingActivity.this, CSettingActivity.class);
+                        Intent c = new Intent(MSettingActivity.this, CSettingActivity.class);
                         startActivityForResult(c,2);
                         break;
                 }
@@ -150,7 +143,7 @@ public class SettingActivity extends Activity implements TextToSpeech.OnInitList
 
                 } else {
                     // 2 : 컨트롤러 설정
-                    Intent c = new Intent(SettingActivity.this, CSettingActivity.class);
+                    Intent c = new Intent(MSettingActivity.this, CSettingActivity.class);
                     startActivityForResult(c,2);
                     finish();
                 }
@@ -198,13 +191,6 @@ public class SettingActivity extends Activity implements TextToSpeech.OnInitList
                 finish();
             }else{
                 tts.speak("오류 발생!",TextToSpeech.QUEUE_FLUSH,null);
-            }
-        }else if(requestCode == 4) {
-            // 모드 변경 후 돌아온 곳
-            if(resultCode == Activity.RESULT_OK) {
-                Intent returnIntent = new Intent();
-                setResult(4, returnIntent);
-                finish();
             }
         }
     }

@@ -57,6 +57,8 @@
 
         <activity android:name=".SettingActivity"></activity>
         <activity android:name=".SM_main"></activity>
+
+        <activity android:name=".MSettingActivity"></activity>
     </application>
 
 </manifest>
