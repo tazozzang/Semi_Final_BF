@@ -1,7 +1,10 @@
 package com.example.tazo.semi_final_bf;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -16,9 +19,15 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceLikelihood;
+import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
@@ -33,11 +42,20 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 
-public class SM_main extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,  GoogleApiClient.OnConnectionFailedListener, PlaceSelectionListener, OnMapReadyCallback {
+public class SM_main extends AppCompatActivity implements com.google.android.gms.location.LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, PlaceSelectionListener, OnMapReadyCallback {
     PlaceAutocompleteFragment autocompleteFragment;
     MapFragment mapFragment;
     GoogleMap map;
     GoogleApiClient googleApiClient = null;
+
+    LocationRequest locationRequest;
+    LocationManager locationManager;
+    Location location;
+
+    Place_Info place_info;
+
+    double latitude;
+    double longitude;
 
     Button search_button;
     SpeechRecognizer recognizer;
@@ -55,7 +73,7 @@ public class SM_main extends AppCompatActivity implements GoogleApiClient.Connec
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sm_main);
 
-        search_button = (Button)findViewById(R.id.search_button);
+        search_button = (Button) findViewById(R.id.search_button);
 
         autocompleteFragment = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_search);
         autocompleteFragment.setOnPlaceSelectedListener(this);
@@ -74,8 +92,8 @@ public class SM_main extends AppCompatActivity implements GoogleApiClient.Connec
         }
 
         i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        i.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,getPackageName());
-        i.putExtra(RecognizerIntent.EXTRA_LANGUAGE,"ko-KR");
+        i.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getPackageName());
+        i.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ko-KR");
 
         recognizer = SpeechRecognizer.createSpeechRecognizer(this);
         recognizer.setRecognitionListener(listner);
@@ -83,14 +101,13 @@ public class SM_main extends AppCompatActivity implements GoogleApiClient.Connec
         search_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(SSTsted == false){
+                if (SSTsted == false) {
                     recognizer.startListening(i);
                     //Toast.makeText(view.getContext(),"시작",Toast.LENGTH_LONG).show();
                     SSTsted = true;
                     //Toast.makeText(getApplicationContext(), "여기까지 오긴 함1",Toast.LENGTH_SHORT).show();
 
-                }
-                else{
+                } else {
                     recognizer.stopListening();
                     SSTsted = false;
                     //Toast.makeText(getApplicationContext(), "여기까지 오긴 함3",Toast.LENGTH_SHORT).show();
@@ -98,7 +115,62 @@ public class SM_main extends AppCompatActivity implements GoogleApiClient.Connec
                 }
             }
         });
+
+        locationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(10000)
+                .setFastestInterval(1000)
+                .setSmallestDisplacement(100);
+
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
+                .getCurrentPlace(googleApiClient, null);
+        result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
+            @Override
+            public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
+                int i = 0;
+                for (PlaceLikelihood placeLikelihood : likelyPlaces) {
+                    if(i == 0)
+                        place_info = new Place_Info( placeLikelihood.getPlace().getName(),placeLikelihood.getPlace().getLatLng());
+                    i++;
+                }
+                likelyPlaces.release();
+            }
+        });
+
     }
+
+
+    public void initialMap(Location location) {
+        map.clear();
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+        final LatLng Loc = new LatLng(latitude, longitude);
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(Loc, 16));
+
+        MarkerOptions options = new MarkerOptions();
+        options.position(Loc);
+        //options.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker));
+        options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
+
+        options.title("내 위치");
+        options.snippet("현재 위치");
+        map.addMarker(options);
+    }
+
+
     private RecognitionListener listner = new RecognitionListener() {
         @Override
         public void onReadyForSpeech(Bundle bundle) {
@@ -140,7 +212,7 @@ public class SM_main extends AppCompatActivity implements GoogleApiClient.Connec
 
             //Toast.makeText(getApplicationContext(), rs[0],Toast.LENGTH_SHORT).show();
             //Toast.makeText(getApplicationContext(), "여기까지 오긴 함2",Toast.LENGTH_SHORT).show();
-            autocompleteFragment.setText(""+rs[0]);
+            autocompleteFragment.setText("" + rs[0]);
 
         }
 
@@ -154,6 +226,7 @@ public class SM_main extends AppCompatActivity implements GoogleApiClient.Connec
 
         }
     };
+
     @Override
     public void onPlaceSelected(Place place) {
         Toast.makeText(this, place.getName(),
@@ -167,7 +240,7 @@ public class SM_main extends AppCompatActivity implements GoogleApiClient.Connec
                 Toast.LENGTH_SHORT).show();
     }
 
-    public void updateMap(Place place){
+    public void updateMap(Place place) {
         map.clear();
 
         final LatLng Loc = new LatLng(place.getLatLng().latitude, place.getLatLng().longitude);
@@ -177,10 +250,11 @@ public class SM_main extends AppCompatActivity implements GoogleApiClient.Connec
         options.position(Loc);
         //options.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker));
         options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
-        options.title(String.valueOf("홍대"));
+        options.title(String.valueOf(place.getName()));
         //options.snippet("내 위치");
         map.addMarker(options);
     }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
@@ -197,7 +271,21 @@ public class SM_main extends AppCompatActivity implements GoogleApiClient.Connec
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+        if(location != null)
+            initialMap(location);
 
+        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient,locationRequest, (LocationListener) this);
     }
 
     @Override
@@ -207,6 +295,11 @@ public class SM_main extends AppCompatActivity implements GoogleApiClient.Connec
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
 
     }
 }
