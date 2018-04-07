@@ -53,11 +53,13 @@ public class SM_main extends AppCompatActivity implements com.google.android.gms
     Location location;
 
     Place_Info place_info;
+    ArrayList<Place_Info> place_name;
 
     double latitude;
     double longitude;
 
     Button search_button;
+    Button add_memo;
     SpeechRecognizer recognizer;
     boolean SSTsted = false;
     Intent i;
@@ -74,6 +76,7 @@ public class SM_main extends AppCompatActivity implements com.google.android.gms
         setContentView(R.layout.activity_sm_main);
 
         search_button = (Button) findViewById(R.id.search_button);
+        add_memo = (Button)findViewById(R.id.add_button);
 
         autocompleteFragment = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_search);
         autocompleteFragment.setOnPlaceSelectedListener(this);
@@ -116,6 +119,14 @@ public class SM_main extends AppCompatActivity implements com.google.android.gms
             }
         });
 
+        add_memo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(),Choose_Place.class);
+                startActivity(intent);
+            }
+        });
+
         locationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(10000)
@@ -135,16 +146,17 @@ public class SM_main extends AppCompatActivity implements com.google.android.gms
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
+
+        place_name = new ArrayList<Place_Info>();
+
         PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
                 .getCurrentPlace(googleApiClient, null);
         result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
             @Override
             public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
-                int i = 0;
                 for (PlaceLikelihood placeLikelihood : likelyPlaces) {
-                    if(i == 0)
-                        place_info = new Place_Info( placeLikelihood.getPlace().getName(),placeLikelihood.getPlace().getLatLng());
-                    i++;
+                    place_info = new Place_Info( placeLikelihood.getPlace().getName(),placeLikelihood.getPlace().getLatLng());
+                    place_name.add(place_info);
                 }
                 likelyPlaces.release();
             }
