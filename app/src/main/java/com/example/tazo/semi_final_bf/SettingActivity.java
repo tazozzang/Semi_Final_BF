@@ -36,10 +36,12 @@ public class SettingActivity extends Activity implements TextToSpeech.OnInitList
     String start;
 
     int keyPosition = -2;
+    String keyChosenName = null;
     SimpleFingerGestures mySfg = new SimpleFingerGestures();
 
     boolean exit = false;
     int RESULT_OK = 1;
+
 
     UtteranceProgressListener listener = new UtteranceProgressListener() {
         @Override
@@ -144,15 +146,17 @@ public class SettingActivity extends Activity implements TextToSpeech.OnInitList
             public boolean onDoubleTap(int i) {
                 if (keyPosition == 0) {
                     // 0 : 설정 취소
-
+                    Intent returnIntent = new Intent();
+                    returnIntent.putExtra("result","ok");
+                    setResult(2, returnIntent);
+                    finish();
                 } else if (keyPosition == 1) {
                     // 1 : 모드 변경
-
+                    startActivityForResult(new Intent(SettingActivity.this, MSettingActivity.class), 4);
                 } else {
                     // 2 : 컨트롤러 설정
                     Intent c = new Intent(SettingActivity.this, CSettingActivity.class);
                     startActivityForResult(c,2);
-                    finish();
                 }
                 return false;
             }
@@ -173,8 +177,31 @@ public class SettingActivity extends Activity implements TextToSpeech.OnInitList
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         listView.setOnTouchListener(mySfg);
         listView.setOnItemClickListener(null);
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                if (keyPosition <= 0) {
+                    keyPosition = 0;
+                }else {
+                    keyPosition--;
+                }
 
-        return super.onKeyDown(keyCode, event);
+                keyChosenName = listView.getItemAtPosition(keyPosition).toString();
+                tts.speak(String.valueOf(keyChosenName), TextToSpeech.QUEUE_FLUSH, null);
+                break;
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                if (keyPosition < 0) {
+                    keyPosition = 0;
+                }else if (keyPosition >= 2) {
+                    keyPosition = 2;
+                } else {
+                    keyPosition++;
+                }
+
+                keyChosenName = listView.getItemAtPosition(keyPosition).toString();
+                tts.speak(String.valueOf(keyChosenName), TextToSpeech.QUEUE_FLUSH, null);
+                break;
+        }
+        return true;
     }
 
     @Override

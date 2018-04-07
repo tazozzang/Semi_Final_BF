@@ -470,17 +470,17 @@ GoogleApiClient.OnConnectionFailedListener{
             }
             if(resultCode == REQUEST_CONTROLLER_MODE) {
                 // resultCode == 4 : 컨트롤러 모드 변경했을 때 적용해야 될 부분
-                tts.speak("메인 화면에 진입하였습니다.",TextToSpeech.QUEUE_FLUSH,null);
+                tts.speak("메인 화면에 진입하였습니다. 컨트롤러 모드로 변경되었습니다.",TextToSpeech.QUEUE_FLUSH,null);
                 v.vibrate(cpattern3,-1);
             }
             if(resultCode == REQUEST_GRID_MODE) {
                 // resultCode == 5 : 바둑판 모드 변경했을 때 적용해야 될 부분
-                tts.speak("메인 화면에 진입하였습니다.",TextToSpeech.QUEUE_FLUSH,null);
+                tts.speak("메인 화면에 진입하였습니다. 바둑판 모드로 변경되었습니다.",TextToSpeech.QUEUE_FLUSH,null);
                 v.vibrate(cpattern3,-1);
             }
             if(resultCode == REQUEST_AUTO_ROLLING_MODE) {
                 // resultCode == 6 : 자동 롤링 모드 변경했을 때 적용해야 될 부분
-                tts.speak("메인 화면에 진입하였습니다.",TextToSpeech.QUEUE_FLUSH,null);
+                tts.speak("메인 화면에 진입하였습니다. 자동 롤링 모드로 변경되었습니다.",TextToSpeech.QUEUE_FLUSH,null);
                 v.vibrate(cpattern3,-1);
             }
         }
