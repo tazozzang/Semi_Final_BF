@@ -6,20 +6,23 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <!-- 지도 관련 권한 등록 -->
-    <uses-feature
+    <!--
+        지도 관련 권한 등록
+    -->
+    <uses-feature android:required="true"
         android:glEsVersion="0x00020000"
-        android:required="true" />
-
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="com.google.android.provides.gsf.permission.READ_GSERVICES" />
+        />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="com.google.android.provides.gsf.permission.READ_GSERVICES"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <!--
+        지도 관련 권한 등록 -> 허용 목록에 추가하기
+    -->
+    
 
-    <!-- 지도 관련 권한 등록 -> 허용 목록에 추가하기 -->
     <!-- 주소록 -->
     <application
         android:allowBackup="true"
@@ -27,12 +30,15 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCb0iZFiCI6EifKxlcXyoWNOWZcuaCP5Ho" />
+            android:value="AIzaSyCb0iZFiCI6EifKxlcXyoWNOWZcuaCP5Ho"/>
 
         <activity android:name=".MainActivity">
             <intent-filter>
@@ -49,12 +55,8 @@
 
         <receiver android:name=".BroadcastD" />
 
-        <activity android:name=".SettingActivity" />
-        <activity android:name=".SM_main" />
-        <activity android:name=".Choose_Place" />
-        <activity android:name=".AddMemoActivity" />
-        <activity android:name=".AddVoiceActivity" />
-        <activity android:name=".AddTextActivity"></activity>
+        <activity android:name=".SettingActivity"></activity>
+        <activity android:name=".SM_main"></activity>
     </application>
 
 </manifest>

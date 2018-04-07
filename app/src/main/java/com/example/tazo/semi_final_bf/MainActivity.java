@@ -67,6 +67,9 @@ GoogleApiClient.OnConnectionFailedListener{
     Context context;
     int REQUEST_CHANGE = 1;
     int REQUEST_RETURN = 2;
+    int REQUEST_CONTROLLER_MODE = 4;
+    int REQUEST_GRID_MODE = 5;
+    int REQUEST_AUTO_ROLLING_MODE = 6;
 
     final long[] cpattern3 = new long[]{200,70,100,25,200,50};
 
@@ -452,22 +455,36 @@ GoogleApiClient.OnConnectionFailedListener{
             if(resultCode == Activity.RESULT_OK) {
                 // 설정 후, 바로 적용되도록 컨트롤러를 초기화시켜줍니다.
                 controllerNum = db_handler.howManyController();
-                for(int i = 0; i < controllerNum; i ++) {
-                    controllers[i] = new Controller(context, i+1);
+                for (int i = 0; i < controllerNum; i++) {
+                    controllers[i] = new Controller(context, i + 1);
                 }
                 mode = none;
                 clickCount = 0;
 
+                tts.speak("메인 화면에 진입하였습니다.", TextToSpeech.QUEUE_FLUSH, null);
+                v.vibrate(cpattern3, -1);
+            }
+            if(resultCode == REQUEST_RETURN) {
+                tts.speak("메인 화면에 진입하였습니다.",TextToSpeech.QUEUE_FLUSH,null);
+                v.vibrate(cpattern3,-1);
+            }
+            if(resultCode == REQUEST_CONTROLLER_MODE) {
+                // resultCode == 4 : 컨트롤러 모드 변경했을 때 적용해야 될 부분
+                tts.speak("메인 화면에 진입하였습니다.",TextToSpeech.QUEUE_FLUSH,null);
+                v.vibrate(cpattern3,-1);
+            }
+            if(resultCode == REQUEST_GRID_MODE) {
+                // resultCode == 5 : 바둑판 모드 변경했을 때 적용해야 될 부분
+                tts.speak("메인 화면에 진입하였습니다.",TextToSpeech.QUEUE_FLUSH,null);
+                v.vibrate(cpattern3,-1);
+            }
+            if(resultCode == REQUEST_AUTO_ROLLING_MODE) {
+                // resultCode == 6 : 자동 롤링 모드 변경했을 때 적용해야 될 부분
                 tts.speak("메인 화면에 진입하였습니다.",TextToSpeech.QUEUE_FLUSH,null);
                 v.vibrate(cpattern3,-1);
             }
         }
-        // -- 바꾼 부분 --
-        if(resultCode == REQUEST_RETURN) {
-            tts.speak("메인 화면에 진입하였습니다.",TextToSpeech.QUEUE_FLUSH,null);
-            v.vibrate(cpattern3,-1);
-        }
-        // -- 바꾼 부분
+
     }
 
     public boolean onTouchEvent(MotionEvent e) {
