@@ -82,21 +82,26 @@ public class MSettingActivity extends Activity implements TextToSpeech.OnInitLis
                 start = ((TextView) view).getText().toString();
                 onInit(9);
 
+                Intent returnIntent = new Intent();
+
                 switch (position) {
                     case 0:
-                        // 컨트롤러 모드
-                        Intent returnIntent = new Intent();
+                        // 4 : 컨트롤러 모드
                         returnIntent.putExtra("result", "ok");
-                        setResult(Activity.RESULT_OK, returnIntent);
+                        setResult(4, returnIntent);
                         finish();
                         break;
                     case 1:
-                        // 모드 변경
+                        // 5 : 바둑판 모드
+                        returnIntent.putExtra("result", "ok");
+                        setResult(5, returnIntent);
+                        finish();
                         break;
                     case 2:
-                        // 컨트롤러 설정
-                        Intent c = new Intent(MSettingActivity.this, CSettingActivity.class);
-                        startActivityForResult(c,2);
+                        // 6 : 자동 롤링 모드
+                        returnIntent.putExtra("result", "ok");
+                        setResult(6, returnIntent);
+                        finish();
                         break;
                 }
             }
@@ -174,25 +179,6 @@ public class MSettingActivity extends Activity implements TextToSpeech.OnInitLis
     protected void onDestroy() {
         super.onDestroy();
         tts.shutdown();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == 2) {
-            // 컨트롤러 설정 후 돌아온 곳
-            if(resultCode == Activity.RESULT_OK) {
-                Intent returnIntent = new Intent();
-                setResult(Activity.RESULT_OK, returnIntent);
-                finish();
-            }else if(resultCode == 2) {
-                Intent returnIntent = new Intent(getApplication(), MainActivity.class);
-                returnIntent.putExtra("result",2);
-                setResult(2, returnIntent);
-                finish();
-            }else{
-                tts.speak("오류 발생!",TextToSpeech.QUEUE_FLUSH,null);
-            }
-        }
     }
 
 }
