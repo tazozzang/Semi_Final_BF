@@ -49,6 +49,7 @@ public class SettingActivity extends Activity implements TextToSpeech.OnInitList
 
         }
 
+
         @Override
         public void onDone(String utteranceId) {
             if(exit) {

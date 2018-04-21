@@ -41,6 +41,9 @@ GoogleApiClient.OnConnectionFailedListener{
     double theta; // startPoint와 currentPoint 벡터의 사이각
     double ztheta; // theta 계산시 사용
 
+    // 컨트롤러 모드(4), 바둑판 모드(5), 자동 롤링 모드(6)
+    int view_mode = 4;
+
     // 컨트롤러 배열과 현재 화면에 있는 컨트롤러 번호 저장.
     Controller[] controllers = new Controller[3];
     int currentController = 0;
@@ -52,7 +55,7 @@ GoogleApiClient.OnConnectionFailedListener{
     // Two Finger Swipe
     int swipe = 1;
     int none = 0;
-    int mode = none;
+    int swipe_mode = none;
     float startX, startY, stopX, stopY;
 
     // Double Tap
@@ -458,7 +461,7 @@ GoogleApiClient.OnConnectionFailedListener{
                 for (int i = 0; i < controllerNum; i++) {
                     controllers[i] = new Controller(context, i + 1);
                 }
-                mode = none;
+                swipe_mode = none;
                 clickCount = 0;
 
                 tts.speak("메인 화면에 진입하였습니다.", TextToSpeech.QUEUE_FLUSH, null);
@@ -470,16 +473,21 @@ GoogleApiClient.OnConnectionFailedListener{
             }
             if(resultCode == REQUEST_CONTROLLER_MODE) {
                 // resultCode == 4 : 컨트롤러 모드 변경했을 때 적용해야 될 부분
+                view_mode = 4;
+                setContentView(R.layout.activity_main);
                 tts.speak("메인 화면에 진입하였습니다. 컨트롤러 모드로 변경되었습니다.",TextToSpeech.QUEUE_FLUSH,null);
                 v.vibrate(cpattern3,-1);
             }
             if(resultCode == REQUEST_GRID_MODE) {
                 // resultCode == 5 : 바둑판 모드 변경했을 때 적용해야 될 부분
+                view_mode = 5;
+                setContentView(R.layout.activity_grid_main);
                 tts.speak("메인 화면에 진입하였습니다. 바둑판 모드로 변경되었습니다.",TextToSpeech.QUEUE_FLUSH,null);
                 v.vibrate(cpattern3,-1);
             }
             if(resultCode == REQUEST_AUTO_ROLLING_MODE) {
                 // resultCode == 6 : 자동 롤링 모드 변경했을 때 적용해야 될 부분
+                view_mode = 6;
                 tts.speak("메인 화면에 진입하였습니다. 자동 롤링 모드로 변경되었습니다.",TextToSpeech.QUEUE_FLUSH,null);
                 v.vibrate(cpattern3,-1);
             }
@@ -488,147 +496,154 @@ GoogleApiClient.OnConnectionFailedListener{
     }
 
     public boolean onTouchEvent(MotionEvent e) {
-        switch (e.getActionMasked() & MotionEvent.ACTION_MASK) {
-            case MotionEvent.ACTION_DOWN:
-                if(e.getPointerCount() == 1) {
-                    sx = e.getX();
-                    sy = e.getY();
-                    controllers[currentController].actionDown(e);
-                    mode = none;
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-                if(e.getPointerCount() == 1) {
-                    if(mode != swipe) {
-                        clickCount++;
+        if(view_mode == 4) {
+            // 컨트롤러 모드
+            switch (e.getActionMasked() & MotionEvent.ACTION_MASK) {
+                case MotionEvent.ACTION_DOWN:
+                    if (e.getPointerCount() == 1) {
+                        sx = e.getX();
+                        sy = e.getY();
+                        controllers[currentController].actionDown(e);
+                        swipe_mode = none;
                     }
-                    Handler handler = new Handler();
-                    if(clickCount == 1) {
-                        startTime = System.currentTimeMillis();
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                if(clickCount == 1 && mode != swipe) {
-                                    controllers[currentController].actionUp();
-                                    clickCount = 0;
-                                }
-                            }
-                        },200);
-
-                    }else if(clickCount == 2) {
-                        long duration = System.currentTimeMillis() - startTime;
-                        if(duration <= 1000) {
-                            // Double Tap
-                            if(controllerNum < 3) {
-                                controllers[controllerNum] = new Controller(getApplicationContext(), controllerNum+1);
-                                controllerNum++;
-                                String alertmsg = "새 컨트롤러"+controllerNum+"이 생성되었습니다.";
-                                if(controllerNum == 2) {
-                                    alertmsg = "새 컨트롤러 2가 생성되었습니다.";
-                                }
-                                Toast.makeText(getApplicationContext(), alertmsg, Toast.LENGTH_SHORT).show();
-                                tts.speak(alertmsg, TextToSpeech.QUEUE_FLUSH, null);
-                                v.vibrate(100);
-                            }else {
-                                String warningmsg = "컨트롤러는 최대 3개입니다.";
-                                Toast.makeText(getApplicationContext(), warningmsg,Toast.LENGTH_SHORT).show();
-                                tts.speak(warningmsg, TextToSpeech.QUEUE_FLUSH, null);
-                                v.vibrate(new long[]{200,100,200,100},-1);
-                            }
-                            clickCount = 0;
-                        }else {
+                    break;
+                case MotionEvent.ACTION_UP:
+                    if (e.getPointerCount() == 1) {
+                        if (swipe_mode != swipe) {
+                            clickCount++;
+                        }
+                        Handler handler = new Handler();
+                        if (clickCount == 1) {
                             startTime = System.currentTimeMillis();
-                            clickCount = 1;
-                        }
-                        break;
-                    }
-                }
-                break;
-            case MotionEvent.ACTION_POINTER_DOWN:
-                clickCount = 0;
-                mode = swipe;
-                if(e.getPointerCount() == 2) {
-                    startY = e.getY(0);
-                    startX = e.getX(0);
-                }
-                break;
-            case MotionEvent.ACTION_POINTER_UP:
-                clickCount = 0;
-                if(e.getPointerCount() == 2) {
-                    String alertmsg = "컨트롤러가 없습니다. 생성하려면 더블 탭";
-                    // right to left swipe (오른쪽)
-                    if (startX - stopX > SWIPE_MIN_DISTANCE && Math.abs(startX - stopX) > SWIPE_THRESHOLD_VELOCITY) {
-                        if (controllerNum == 1) {
-                            Toast.makeText(context, alertmsg, Toast.LENGTH_SHORT).show();
-                            tts.speak(alertmsg,TextToSpeech.QUEUE_FLUSH, null);
-                        } else {
-                            currentController = (currentController + 1) % controllerNum;
-                            if(currentController == 0) {
-                                v.vibrate(cpattern3,-1);
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (clickCount == 1 && swipe_mode != swipe) {
+                                        controllers[currentController].actionUp();
+                                        clickCount = 0;
+                                    }
+                                }
+                            }, 200);
+
+                        } else if (clickCount == 2) {
+                            long duration = System.currentTimeMillis() - startTime;
+                            if (duration <= 1000) {
+                                // Double Tap
+                                if (controllerNum < 3) {
+                                    controllers[controllerNum] = new Controller(getApplicationContext(), controllerNum + 1);
+                                    controllerNum++;
+                                    String alertmsg = "새 컨트롤러" + controllerNum + "이 생성되었습니다.";
+                                    if (controllerNum == 2) {
+                                        alertmsg = "새 컨트롤러 2가 생성되었습니다.";
+                                    }
+                                    Toast.makeText(getApplicationContext(), alertmsg, Toast.LENGTH_SHORT).show();
+                                    tts.speak(alertmsg, TextToSpeech.QUEUE_FLUSH, null);
+                                    v.vibrate(100);
+                                } else {
+                                    String warningmsg = "컨트롤러는 최대 3개입니다.";
+                                    Toast.makeText(getApplicationContext(), warningmsg, Toast.LENGTH_SHORT).show();
+                                    tts.speak(warningmsg, TextToSpeech.QUEUE_FLUSH, null);
+                                    v.vibrate(new long[]{200, 100, 200, 100}, -1);
+                                }
+                                clickCount = 0;
+                            } else {
+                                startTime = System.currentTimeMillis();
+                                clickCount = 1;
                             }
-                        }
-                        int forspeak = currentController+1;
-                        if(forspeak == 1) {
-                            tts.speak("첫번째", TextToSpeech.QUEUE_FLUSH, null);
-                        }else if(forspeak == 2) {
-                            tts.speak("두번째", TextToSpeech.QUEUE_FLUSH, null);
-                        }else if(forspeak == 3) {
-                            tts.speak("세번째", TextToSpeech.QUEUE_FLUSH, null);
+                            break;
                         }
                     }
-                    // left to right swipe (왼쪽)
-                    else if (stopX - startX > SWIPE_MIN_DISTANCE && Math.abs(stopX - startX) > SWIPE_THRESHOLD_VELOCITY) {
-                        if (controllerNum == 1) {
-                            Toast.makeText(context, alertmsg, Toast.LENGTH_SHORT).show();
-                            tts.speak(alertmsg,TextToSpeech.QUEUE_FLUSH, null);
-                        } else {
-                            if (currentController == 0) {
-                                // 처음과 끝을 이어보아요
-                                currentController = controllerNum -1;
-                            }else {
-                                currentController = (currentController - 1) % controllerNum;
-                                if(currentController == 0) {
-                                    v.vibrate(cpattern3,-1);
+                    break;
+                case MotionEvent.ACTION_POINTER_DOWN:
+                    clickCount = 0;
+                    swipe_mode = swipe;
+                    if (e.getPointerCount() == 2) {
+                        startY = e.getY(0);
+                        startX = e.getX(0);
+                    }
+                    break;
+                case MotionEvent.ACTION_POINTER_UP:
+                    clickCount = 0;
+                    if (e.getPointerCount() == 2) {
+                        String alertmsg = "컨트롤러가 없습니다. 생성하려면 더블 탭";
+                        // right to left swipe (오른쪽)
+                        if (startX - stopX > SWIPE_MIN_DISTANCE && Math.abs(startX - stopX) > SWIPE_THRESHOLD_VELOCITY) {
+                            if (controllerNum == 1) {
+                                Toast.makeText(context, alertmsg, Toast.LENGTH_SHORT).show();
+                                tts.speak(alertmsg, TextToSpeech.QUEUE_FLUSH, null);
+                            } else {
+                                currentController = (currentController + 1) % controllerNum;
+                                if (currentController == 0) {
+                                    v.vibrate(cpattern3, -1);
                                 }
                             }
+                            int forspeak = currentController + 1;
+                            if (forspeak == 1) {
+                                tts.speak("첫번째", TextToSpeech.QUEUE_FLUSH, null);
+                            } else if (forspeak == 2) {
+                                tts.speak("두번째", TextToSpeech.QUEUE_FLUSH, null);
+                            } else if (forspeak == 3) {
+                                tts.speak("세번째", TextToSpeech.QUEUE_FLUSH, null);
+                            }
                         }
-                        int forspeak = currentController+1;
-                        if(forspeak == 1) {
-                            tts.speak("첫번째", TextToSpeech.QUEUE_FLUSH, null);
-                        }else if(forspeak == 2) {
-                            tts.speak("두번째", TextToSpeech.QUEUE_FLUSH, null);
-                        }else if(forspeak == 3) {
-                            tts.speak("세번째", TextToSpeech.QUEUE_FLUSH, null);
+                        // left to right swipe (왼쪽)
+                        else if (stopX - startX > SWIPE_MIN_DISTANCE && Math.abs(stopX - startX) > SWIPE_THRESHOLD_VELOCITY) {
+                            if (controllerNum == 1) {
+                                Toast.makeText(context, alertmsg, Toast.LENGTH_SHORT).show();
+                                tts.speak(alertmsg, TextToSpeech.QUEUE_FLUSH, null);
+                            } else {
+                                if (currentController == 0) {
+                                    // 처음과 끝을 이어보아요
+                                    currentController = controllerNum - 1;
+                                } else {
+                                    currentController = (currentController - 1) % controllerNum;
+                                    if (currentController == 0) {
+                                        v.vibrate(cpattern3, -1);
+                                    }
+                                }
+                            }
+                            int forspeak = currentController + 1;
+                            if (forspeak == 1) {
+                                tts.speak("첫번째", TextToSpeech.QUEUE_FLUSH, null);
+                            } else if (forspeak == 2) {
+                                tts.speak("두번째", TextToSpeech.QUEUE_FLUSH, null);
+                            } else if (forspeak == 3) {
+                                tts.speak("세번째", TextToSpeech.QUEUE_FLUSH, null);
+                            }
+                        }
+                        // down to up swipe
+                        else if (startY - stopY > SWIPE_MIN_DISTANCE && Math.abs(startY - stopY) > SWIPE_THRESHOLD_VELOCITY) {
+                            // 설정 메뉴 진입!!!!!
+                            String settinmsg = "설정 메뉴로 진입합니다.";
+                            Toast.makeText(context, settinmsg, Toast.LENGTH_SHORT).show();
+                            tts.speak(settinmsg, TextToSpeech.QUEUE_FLUSH, null);
+                            Intent intent = new Intent(context, SettingActivity.class);
+                            startActivityForResult(intent, REQUEST_CHANGE);
+                        }
+                        // up to down swipe
+                        else if (stopY - startY > SWIPE_MIN_DISTANCE && Math.abs(stopY - startY) > SWIPE_THRESHOLD_VELOCITY) {
+                            // 간단 알람 기능
+                            String makeAlarm = "알람 만들기 진입합니다.";
+                            Toast.makeText(context, "Make Alarm", Toast.LENGTH_SHORT).show();
+                            tts.speak(makeAlarm, TextToSpeech.QUEUE_ADD, null);
+                            Intent intent = new Intent(context, MakeAlarm.class);
+                            startActivity(intent);
                         }
                     }
-                    // down to up swipe
-                    else if (startY - stopY > SWIPE_MIN_DISTANCE && Math.abs(startY - stopY) > SWIPE_THRESHOLD_VELOCITY) {
-                        // 설정 메뉴 진입!!!!!
-                        String settinmsg = "설정 메뉴로 진입합니다.";
-                        Toast.makeText(context, settinmsg, Toast.LENGTH_SHORT).show();
-                        tts.speak(settinmsg, TextToSpeech.QUEUE_FLUSH, null);
-                        Intent intent = new Intent(context, SettingActivity.class);
-                        startActivityForResult(intent,REQUEST_CHANGE);
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    if (e.getPointerCount() == 2) {
+                        stopY = e.getY(0);
+                        stopX = e.getX(0);
+                    } else {
+                        calculate_theta(e);
                     }
-                    // up to down swipe
-                    else if (stopY - startY > SWIPE_MIN_DISTANCE && Math.abs(stopY - startY) > SWIPE_THRESHOLD_VELOCITY) {
-                        // 간단 알람 기능
-                        String makeAlarm = "알람 만들기 진입합니다.";
-                        Toast.makeText(context, "Make Alarm", Toast.LENGTH_SHORT).show();
-                        tts.speak(makeAlarm,TextToSpeech.QUEUE_ADD, null);
-                        Intent intent = new Intent(context, MakeAlarm.class);
-                        startActivity(intent);
-                    }
-                }
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if(e.getPointerCount() == 2) {
-                    stopY = e.getY(0);
-                    stopX = e.getX(0);
-                }else {
-                    calculate_theta(e);
-                }
-                break;
+                    break;
+            }
+        }else if(view_mode == 5) {
+            // 바둑판 모드
+        }else if(view_mode == 6) {
+            // 자동 롤링 모드
         }
         return super.onTouchEvent(e);
     }
