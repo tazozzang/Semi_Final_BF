@@ -5,22 +5,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.example.tazo.semi_final_bf.AddTextActivity">
-    <EditText
-        android:id="@+id/TextMemo"
-        android:padding="10dp"
+    tools:context="com.example.tazo.semi_final_bf.MyMemoActivity">
+
+    <ListView
+
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:maxHeight="100dp"
-        android:textSize="20dp"
-        android:hint="여기에 입력하세요"/>
+        android:layout_height="wrap_content"
+        android:id="@+id/mlistView"/>
 
     <Button
-        android:layout_gravity="bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="20dp"
         android:textSize="20dp"
-        android:text="저장하기"
-        android:onClick="onSaveTextMemo"/>
+        android:text="메인으로 가기"
+        android:onClick="onBack"/>
+
 </LinearLayout>

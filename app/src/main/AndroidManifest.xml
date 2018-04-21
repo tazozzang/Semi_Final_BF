@@ -54,8 +54,9 @@
         <activity android:name=".Choose_Place" />
         <activity android:name=".AddMemoActivity" />
         <activity android:name=".AddVoiceActivity" />
-        <activity android:name=".AddTextActivity"></activity>
-        <activity android:name=".MSettingActivity"/>
+        <activity android:name=".AddTextActivity" />
+        <activity android:name=".MSettingActivity" />
+        <activity android:name=".MyMemoActivity"></activity>
     </application>
 
 </manifest>

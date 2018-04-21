@@ -6,9 +6,11 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -40,13 +42,15 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.File;
 import java.util.ArrayList;
 
-public class SM_main extends AppCompatActivity implements com.google.android.gms.location.LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, PlaceSelectionListener, OnMapReadyCallback {
+public class SM_main extends AppCompatActivity implements com.google.android.gms.location.LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, PlaceSelectionListener, OnMapReadyCallback, TextToSpeech.OnInitListener {
     PlaceAutocompleteFragment autocompleteFragment;
     MapFragment mapFragment;
     GoogleMap map;
     GoogleApiClient googleApiClient = null;
+    TextToSpeech tts;
 
     LocationRequest locationRequest;
     LocationManager locationManager;
@@ -60,6 +64,15 @@ public class SM_main extends AppCompatActivity implements com.google.android.gms
 
     Button search_button;
     Button add_memo;
+    Button btn_myMemo;
+
+    File filesv;
+    File filest;
+
+    int numvoice=0;
+    int numtext=0;
+    int numoffile = 0;
+
     SpeechRecognizer recognizer;
     boolean SSTsted = false;
     Intent i;
@@ -77,6 +90,7 @@ public class SM_main extends AppCompatActivity implements com.google.android.gms
 
         search_button = (Button) findViewById(R.id.search_button);
         add_memo = (Button)findViewById(R.id.add_button);
+        btn_myMemo = (Button)findViewById(R.id.btn_myMemo);
 
         autocompleteFragment = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_search);
         autocompleteFragment.setOnPlaceSelectedListener(this);
@@ -126,6 +140,37 @@ public class SM_main extends AppCompatActivity implements com.google.android.gms
                 startActivity(intent);
             }
         });
+
+
+
+        btn_myMemo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(),MyMemoActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        String ext = Environment.getExternalStorageState();
+        if (ext.equals(Environment.MEDIA_MOUNTED)) {
+            filesv = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Documents/SF_SM/Voice");
+            filesv.mkdirs(); // 있으면 안만들거고, 없으면 만들어주게~
+            String numfilev[] = filesv.list();
+            numvoice = numfilev.length;
+            filest = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Documents/SF_SM/Text");
+            filest.mkdirs();
+            String numfilet[] = filest.list();
+            numtext = numfilet.length;
+        }
+        numoffile = numvoice + numtext;
+        btn_myMemo = (Button)findViewById(R.id.btn_myMemo);
+        String hey = "내가 남긴 "+String.valueOf(numoffile)+"개 메모";
+
+        btn_myMemo.setText(hey);
+        // 메모가 몇개인지 알아내서 버튼 이름 바꿔야지~
+        tts = new TextToSpeech(this, this);
+        //tts.speak("주변에 내가 남긴 N개의 메모가 있습니다",TextToSpeech.QUEUE_FLUSH,null);
+
 
         locationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
@@ -312,6 +357,11 @@ public class SM_main extends AppCompatActivity implements com.google.android.gms
 
     @Override
     public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void onInit(int i) {
 
     }
 }
