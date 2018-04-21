@@ -72,7 +72,7 @@ public class AddVoiceActivity extends AppCompatActivity implements TextToSpeech.
             // 녹음중이 아니라면 -> 녹음 시작
             recordingState = true;
             try {
-                File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SpotMemo/Voice/");
+                File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SF_SM/Voice/");
                 File []fileList = nfile.listFiles();
                 int i = 0;
                 for(File temp : fileList){

@@ -52,7 +52,7 @@ public class AddTextActivity extends AppCompatActivity implements  TextToSpeech.
             nar = "메모 내용을 입력하세요";
             onInit(0);
         }else {
-            File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SpotMemo/Text/");
+            File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SF_SM/Text/");
 
             boolean f = nfile.mkdirs();
 

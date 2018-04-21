@@ -37,6 +37,13 @@
         android:layout_height="300dp"
         android:name="com.google.android.gms.maps.MapFragment"
         />
-
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:textSize="20dp"
+        android:text="내가 남긴 N개 메모"
+        android:id="@+id/btn_myMemo"
+        />
 
 </LinearLayout>
