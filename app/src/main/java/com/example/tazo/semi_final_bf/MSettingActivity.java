@@ -64,7 +64,6 @@ public class MSettingActivity extends Activity implements TextToSpeech.OnInitLis
         adapter = new ArrayAdapter(getApplicationContext(), R.layout.row);
         adapter.add("컨트롤러 모드");
         adapter.add("바둑판 모드");
-        adapter.add("자동롤링 모드");
         listView.setAdapter(adapter);
 
         tts = new TextToSpeech(this, this);
@@ -96,12 +95,6 @@ public class MSettingActivity extends Activity implements TextToSpeech.OnInitLis
                         // 5 : 바둑판 모드
                         returnIntent.putExtra("result", "ok");
                         setResult(5, returnIntent);
-                        finish();
-                        break;
-                    case 2:
-                        // 6 : 자동 롤링 모드
-                        returnIntent.putExtra("result", "ok");
-                        setResult(6, returnIntent);
                         finish();
                         break;
                 }
@@ -152,11 +145,6 @@ public class MSettingActivity extends Activity implements TextToSpeech.OnInitLis
                     returnIntent.putExtra("result", "ok");
                     setResult(5, returnIntent);
                     finish();
-                } else {
-                    // 2 : 자동 롤링 모드
-                    returnIntent.putExtra("result", "ok");
-                    setResult(6, returnIntent);
-                    finish();
                 }
                 return false;
             }
@@ -191,8 +179,8 @@ public class MSettingActivity extends Activity implements TextToSpeech.OnInitLis
             case KeyEvent.KEYCODE_VOLUME_DOWN:
                 if (keyPosition < 0) {
                     keyPosition = 0;
-                }else if (keyPosition >= 2) {
-                    keyPosition = 2;
+                }else if (keyPosition >= 1) {
+                    keyPosition = 1;
                 } else {
                     keyPosition++;
                 }

@@ -41,7 +41,7 @@ GoogleApiClient.OnConnectionFailedListener{
     double theta; // startPoint와 currentPoint 벡터의 사이각
     double ztheta; // theta 계산시 사용
 
-    // 컨트롤러 모드(4), 바둑판 모드(5), 자동 롤링 모드(6)
+    // 컨트롤러 모드(4), 바둑판 모드(5)
     int view_mode = 4;
 
     // 컨트롤러 배열과 현재 화면에 있는 컨트롤러 번호 저장.
@@ -642,8 +642,6 @@ GoogleApiClient.OnConnectionFailedListener{
             }
         }else if(view_mode == 5) {
             // 바둑판 모드
-        }else if(view_mode == 6) {
-            // 자동 롤링 모드
         }
         return super.onTouchEvent(e);
     }
