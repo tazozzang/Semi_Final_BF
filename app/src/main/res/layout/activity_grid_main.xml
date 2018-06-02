@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin">
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:columnCount="3"
+        android:rowCount="3"
+        android:useDefaultMargins="true">
+
+        <ImageView
+            android:id="@+id/oneone"
+            android:src="@drawable/ic_audiotrack_dark"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"/>
+        <ImageView
+            android:id="@+id/onetwo"
+            android:src="@drawable/ic_audiotrack_dark"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"/>
+        <ImageView
+            android:id="@+id/onethree"
+            android:src="@drawable/ic_audiotrack_dark"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"/>
+
+        <ImageView
+            android:id="@+id/twoone"
+            android:src="@drawable/ic_audiotrack_dark"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"/>
+        <ImageView
+            android:id="@+id/twotwo"
+            android:src="@drawable/ic_audiotrack_dark"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"/>
+        <ImageView
+            android:id="@+id/twothree"
+            android:src="@drawable/ic_audiotrack_dark"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"/>
+
+        <ImageView
+            android:id="@+id/threeone"
+            android:src="@drawable/ic_audiotrack_dark"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"/>
+        <ImageView
+            android:id="@+id/threetwo"
+            android:src="@drawable/ic_audiotrack_dark"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"/>
+        <ImageView
+            android:id="@+id/threethree"
+            android:src="@drawable/ic_audiotrack_dark"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"/>
+    </GridLayout>
+
+</LinearLayout>
