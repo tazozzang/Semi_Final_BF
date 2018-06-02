@@ -6,6 +6,7 @@ import android.os.Environment;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -58,23 +59,23 @@ public class MyMemoActivity extends AppCompatActivity  implements TextToSpeech.O
             }
             listView.setAdapter(filelist);
 
-//            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//                @Override
-//                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                    Intent i = new Intent(getApplicationContext(), ReadMemoActivity.class);
-//                    if(fType.get(position) == 0) {
-//                        // 음성 파일이면 재생
-//                        i.putExtra("type",0);
-//
-//                        i.putExtra("file",fPath.get(position));
-//                        startActivity(i);
-//                    }else {
-//                        i.putExtra("type",1);
-//                        i.putExtra("file",fPath.get(position));
-//                        startActivity(i);
-//                    }
-//                }
-//            });
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent i = new Intent(getApplicationContext(), ReadMemoActivity.class);
+                    if(fType.get(position) == 0) {
+                        // 음성 파일이면 재생
+                        i.putExtra("type",0);
+
+                        i.putExtra("file",fPath.get(position));
+                        startActivity(i);
+                    }else {
+                        i.putExtra("type",1);
+                        i.putExtra("file",fPath.get(position));
+                        startActivity(i);
+                    }
+                }
+            });
         }
 
     }
