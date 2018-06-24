@@ -72,7 +72,6 @@ GoogleApiClient.OnConnectionFailedListener{
     int REQUEST_RETURN = 2;
     int REQUEST_CONTROLLER_MODE = 4;
     int REQUEST_GRID_MODE = 5;
-    int REQUEST_AUTO_ROLLING_MODE = 6;
 
     final long[] cpattern3 = new long[]{200,70,100,25,200,50};
 
@@ -170,7 +169,21 @@ GoogleApiClient.OnConnectionFailedListener{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        db_handler = DB_Handler.open(this);
+        view_mode = db_handler.getMode();
+        if(view_mode == 4) {
+            setContentView(R.layout.activity_main);
+        }else if(view_mode == 5){
+            setContentView(R.layout.activity_grid_main);
+        }else {
+            // DB에 저장된 view mode가 없음
+            view_mode = 4; // 기본 모드는 컨트롤러 모드
+            long result = db_handler.setMode(view_mode);
+            if(result == -1) {
+                Toast.makeText(this, "DB ERROR!!",Toast.LENGTH_LONG).show();
+            }
+            setContentView(R.layout.activity_main);
+        }
 
         googleApiClient = new GoogleApiClient.Builder(this).addApi(Wearable.API)
                 .addConnectionCallbacks(this)
@@ -196,7 +209,6 @@ GoogleApiClient.OnConnectionFailedListener{
         v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         // DB
-        db_handler = DB_Handler.open(this);
         currentController = 0;
         controllerNum = db_handler.howManyController();
         for(int i = 0; i < controllerNum; i ++) {
@@ -474,22 +486,26 @@ GoogleApiClient.OnConnectionFailedListener{
             if(resultCode == REQUEST_CONTROLLER_MODE) {
                 // resultCode == 4 : 컨트롤러 모드 변경했을 때 적용해야 될 부분
                 view_mode = 4;
-                setContentView(R.layout.activity_main);
-                tts.speak("메인 화면에 진입하였습니다. 컨트롤러 모드로 변경되었습니다.",TextToSpeech.QUEUE_FLUSH,null);
-                v.vibrate(cpattern3,-1);
+                int result = db_handler.updateMode(view_mode);
+                if(result != -1) {
+                    setContentView(R.layout.activity_main);
+                    tts.speak("메인 화면에 진입하였습니다. 컨트롤러 모드로 변경되었습니다.", TextToSpeech.QUEUE_FLUSH, null);
+                    v.vibrate(cpattern3, -1);
+                }else {
+                    Toast.makeText(this,"Mode Setting Error!!",Toast.LENGTH_SHORT).show();
+                }
             }
             if(resultCode == REQUEST_GRID_MODE) {
                 // resultCode == 5 : 바둑판 모드 변경했을 때 적용해야 될 부분
                 view_mode = 5;
-                setContentView(R.layout.activity_grid_main);
-                tts.speak("메인 화면에 진입하였습니다. 바둑판 모드로 변경되었습니다.",TextToSpeech.QUEUE_FLUSH,null);
-                v.vibrate(cpattern3,-1);
-            }
-            if(resultCode == REQUEST_AUTO_ROLLING_MODE) {
-                // resultCode == 6 : 자동 롤링 모드 변경했을 때 적용해야 될 부분
-                view_mode = 6;
-                tts.speak("메인 화면에 진입하였습니다. 자동 롤링 모드로 변경되었습니다.",TextToSpeech.QUEUE_FLUSH,null);
-                v.vibrate(cpattern3,-1);
+                int result = db_handler.updateMode(view_mode);
+                if(result != -1) {
+                    setContentView(R.layout.activity_grid_main);
+                    tts.speak("메인 화면에 진입하였습니다. 바둑판 모드로 변경되었습니다.", TextToSpeech.QUEUE_FLUSH, null);
+                    v.vibrate(cpattern3, -1);
+                }else {
+                    Toast.makeText(this,"Mode Setting Error!!",Toast.LENGTH_SHORT).show();
+                }
             }
         }
 
