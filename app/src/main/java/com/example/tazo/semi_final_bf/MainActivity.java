@@ -18,6 +18,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -173,8 +175,18 @@ GoogleApiClient.OnConnectionFailedListener{
         view_mode = db_handler.getMode();
         if(view_mode == 4) {
             setContentView(R.layout.activity_main);
-        }else if(view_mode == 5){
+        }else if(view_mode == 5) {
             setContentView(R.layout.activity_grid_main);
+            ImageView iv = (ImageView)findViewById(R.id.oneone);
+            iv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    view_mode = 4;
+                    setContentView(R.layout.activity_main);
+                    // 잠시 모드를 바꿀 수 있는 용도로 쓸 것임
+                }
+            });
+
         }else {
             // DB에 저장된 view mode가 없음
             view_mode = 4; // 기본 모드는 컨트롤러 모드
@@ -501,7 +513,7 @@ GoogleApiClient.OnConnectionFailedListener{
                 int result = db_handler.updateMode(view_mode);
                 if(result != -1) {
                     setContentView(R.layout.activity_grid_main);
-                    tts.speak("메인 화면에 진입하였습니다. 바둑판 모드로 변경되었습니다.", TextToSpeech.QUEUE_FLUSH, null);
+                    tts.speak("메인 화면에 진입하였습니다. 격자 모드로 변경되었습니다.", TextToSpeech.QUEUE_FLUSH, null);
                     v.vibrate(cpattern3, -1);
                 }else {
                     Toast.makeText(this,"Mode Setting Error!!",Toast.LENGTH_SHORT).show();

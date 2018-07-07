@@ -63,7 +63,7 @@ public class MSettingActivity extends Activity implements TextToSpeech.OnInitLis
         listView = (ListView)findViewById(R.id.setting_listview);
         adapter = new ArrayAdapter(getApplicationContext(), R.layout.row);
         adapter.add("컨트롤러 모드");
-        adapter.add("바둑판 모드");
+        adapter.add("격자 무늬 모드");
         listView.setAdapter(adapter);
 
         tts = new TextToSpeech(this, this);
@@ -92,7 +92,7 @@ public class MSettingActivity extends Activity implements TextToSpeech.OnInitLis
                         finish();
                         break;
                     case 1:
-                        // 5 : 바둑판 모드
+                        // 5 : 격자 무늬 모드
                         returnIntent.putExtra("result", "ok");
                         setResult(5, returnIntent);
                         finish();
