@@ -56,13 +56,16 @@ GoogleApiClient.OnConnectionFailedListener{
     int gridIndex = 0;
     List<View> GridList;
 
+    String focusedName = null; // 현재 포커싱 된 아이콘의 이름
+    String focusedPName = null; // 현재 포커싱 된 아이콘의 패키지명
+
     // 컨트롤러 배열과 현재 화면에 있는 컨트롤러 번호 저장.
     Controller[] controllers = new Controller[3];
     int currentController = 0;
     int controllerNum = 1;
 
-    private static final int SWIPE_MIN_DISTANCE = 120;
-    private static final int SWIPE_THRESHOLD_VELOCITY = 200;
+    private static final int SWIPE_MIN_DISTANCE = 100;
+    private static final int SWIPE_THRESHOLD_VELOCITY = 100;
 
     // Two Finger Swipe
     int swipe = 1;
@@ -542,6 +545,19 @@ GoogleApiClient.OnConnectionFailedListener{
                     setContentView(R.layout.activity_grid_main);
                     tts.speak("메인 화면에 진입하였습니다. 격자 모드로 변경되었습니다.", TextToSpeech.QUEUE_FLUSH, null);
                     v.vibrate(cpattern3, -1);
+
+                    GridList.add(findViewById(R.id.oneone));
+                    GridList.add(findViewById(R.id.onetwo));
+                    GridList.add(findViewById(R.id.onethree));
+                    GridList.add(findViewById(R.id.twoone));
+                    GridList.add(findViewById(R.id.twotwo));
+                    GridList.add(findViewById(R.id.twothree));
+                    GridList.add(findViewById(R.id.threeone));
+                    GridList.add(findViewById(R.id.threetwo));
+                    GridList.add(findViewById(R.id.threethree));
+
+                    gridIndex = 0;
+                    gridSetting.setGrid(this, gridIndex, GridList);
                 }else {
                     Toast.makeText(this,"Mode Setting Error!!",Toast.LENGTH_SHORT).show();
                 }
@@ -551,38 +567,47 @@ GoogleApiClient.OnConnectionFailedListener{
     }
 
     public boolean onTouchEvent(MotionEvent e) {
-        if(view_mode == 4) {
-            // 컨트롤러 모드
-            switch (e.getActionMasked() & MotionEvent.ACTION_MASK) {
-                case MotionEvent.ACTION_DOWN:
+
+        switch (e.getActionMasked() & MotionEvent.ACTION_MASK) {
+            case MotionEvent.ACTION_DOWN:
+                sx = e.getX();
+                sy = e.getY();
+                swipe_mode = none;
+                if(view_mode == 4) {
                     if (e.getPointerCount() == 1) {
-                        sx = e.getX();
-                        sy = e.getY();
                         controllers[currentController].actionDown(e);
-                        swipe_mode = none;
                     }
-                    break;
-                case MotionEvent.ACTION_UP:
-                    if (e.getPointerCount() == 1) {
-                        if (swipe_mode != swipe) {
-                            clickCount++;
-                        }
-                        Handler handler = new Handler();
-                        if (clickCount == 1) {
-                            startTime = System.currentTimeMillis();
-                            handler.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                if (e.getPointerCount() == 1) {
+                    if (swipe_mode != swipe) {
+                        clickCount++;
+                    }
+                    Handler handler = new Handler();
+                    if (clickCount == 1) {
+                        startTime = System.currentTimeMillis();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                if(view_mode == 4) {
                                     if (clickCount == 1 && swipe_mode != swipe) {
                                         controllers[currentController].actionUp();
                                         clickCount = 0;
                                     }
+                                }else {
+                                    // 아이콘 포커스
+                                    int iconSelected = calculate_grid(sx,sy);
+                                    focusedName = gridSetting.getGridIconName(gridIndex + iconSelected - 1);
+                                    focusedPName = gridSetting.getGridIconPName(gridIndex + iconSelected - 1);
                                 }
-                            }, 200);
+                            }
+                        }, 200);
 
-                        } else if (clickCount == 2) {
-                            long duration = System.currentTimeMillis() - startTime;
-                            if (duration <= 1000) {
+                    }else if (clickCount == 2) {
+                        long duration = System.currentTimeMillis() - startTime;
+                        if (duration <= 1000) {
+                            if(view_mode == 4) {
                                 // Double Tap
                                 if (controllerNum < 3) {
                                     controllers[controllerNum] = new Controller(getApplicationContext(), controllerNum + 1);
@@ -600,29 +625,37 @@ GoogleApiClient.OnConnectionFailedListener{
                                     tts.speak(warningmsg, TextToSpeech.QUEUE_FLUSH, null);
                                     v.vibrate(new long[]{200, 100, 200, 100}, -1);
                                 }
-                                clickCount = 0;
-                            } else {
-                                startTime = System.currentTimeMillis();
-                                clickCount = 1;
+                            }else {
+                                // 포커스 된 아이콘 실행
+                                Intent fi = pm.getLaunchIntentForPackage(focusedPName);
+                                startActivity(fi);
                             }
-                            break;
+                            clickCount = 0;
+                        } else {
+                            startTime = System.currentTimeMillis();
+                            clickCount = 1;
                         }
                     }
-                    break;
-                case MotionEvent.ACTION_POINTER_DOWN:
-                    clickCount = 0;
-                    swipe_mode = swipe;
-                    if (e.getPointerCount() == 2) {
-                        startY = e.getY(0);
-                        startX = e.getX(0);
-                    }
-                    break;
-                case MotionEvent.ACTION_POINTER_UP:
-                    clickCount = 0;
-                    if (e.getPointerCount() == 2) {
-                        String alertmsg = "컨트롤러가 없습니다. 생성하려면 더블 탭";
-                        // right to left swipe (오른쪽)
-                        if (startX - stopX > SWIPE_MIN_DISTANCE && Math.abs(startX - stopX) > SWIPE_THRESHOLD_VELOCITY) {
+                }
+                break;
+            case MotionEvent.ACTION_POINTER_DOWN:
+                clickCount = 0;
+                swipe_mode = swipe;
+                if (e.getPointerCount() == 2) {
+                    focusedPName = null;
+                    focusedName = null;
+                    startY = e.getY(0);
+                    startX = e.getX(0);
+                }
+                break;
+            case MotionEvent.ACTION_POINTER_UP:
+                clickCount = 0;
+                if (e.getPointerCount() == 2) {
+                    String alertmsg = "컨트롤러가 없습니다. 생성하려면 더블 탭";
+
+                    // right to left swipe (오른쪽)
+                    if (startX - stopX > SWIPE_MIN_DISTANCE && Math.abs(startX - stopX) > SWIPE_THRESHOLD_VELOCITY) {
+                        if(view_mode == 4) {
                             if (controllerNum == 1) {
                                 Toast.makeText(context, alertmsg, Toast.LENGTH_SHORT).show();
                                 tts.speak(alertmsg, TextToSpeech.QUEUE_FLUSH, null);
@@ -641,8 +674,20 @@ GoogleApiClient.OnConnectionFailedListener{
                                 tts.speak("세번째", TextToSpeech.QUEUE_FLUSH, null);
                             }
                         }
-                        // left to right swipe (왼쪽)
-                        else if (stopX - startX > SWIPE_MIN_DISTANCE && Math.abs(stopX - startX) > SWIPE_THRESHOLD_VELOCITY) {
+                        if(view_mode == 5) {
+                            if(gridIndex +9 < gridSetting.getLimit(context)) {
+                                gridIndex = gridIndex +9;
+                                gridSetting.setGrid(this, gridIndex, GridList);
+                                v.vibrate(cpattern3, -1);
+                            }else {
+                                Toast.makeText(this, "마지막 페이지입니다.",Toast.LENGTH_SHORT).show();
+                                v.vibrate(cpattern3, -1);
+                            }
+                        }
+                    }
+                    // left to right swipe (왼쪽)
+                    else if (stopX - startX > SWIPE_MIN_DISTANCE && Math.abs(stopX - startX) > SWIPE_THRESHOLD_VELOCITY) {
+                        if(view_mode == 4) {
                             if (controllerNum == 1) {
                                 Toast.makeText(context, alertmsg, Toast.LENGTH_SHORT).show();
                                 tts.speak(alertmsg, TextToSpeech.QUEUE_FLUSH, null);
@@ -666,38 +711,49 @@ GoogleApiClient.OnConnectionFailedListener{
                                 tts.speak("세번째", TextToSpeech.QUEUE_FLUSH, null);
                             }
                         }
-                        // down to up swipe
-                        else if (startY - stopY > SWIPE_MIN_DISTANCE && Math.abs(startY - stopY) > SWIPE_THRESHOLD_VELOCITY) {
-                            // 설정 메뉴 진입!!!!!
-                            String settinmsg = "설정 메뉴로 진입합니다.";
-                            Toast.makeText(context, settinmsg, Toast.LENGTH_SHORT).show();
-                            tts.speak(settinmsg, TextToSpeech.QUEUE_FLUSH, null);
-                            Intent intent = new Intent(context, SettingActivity.class);
-                            startActivityForResult(intent, REQUEST_CHANGE);
-                        }
-                        // up to down swipe
-                        else if (stopY - startY > SWIPE_MIN_DISTANCE && Math.abs(stopY - startY) > SWIPE_THRESHOLD_VELOCITY) {
-                            // 간단 알람 기능
-                            String makeAlarm = "알람 만들기 진입합니다.";
-                            Toast.makeText(context, "Make Alarm", Toast.LENGTH_SHORT).show();
-                            tts.speak(makeAlarm, TextToSpeech.QUEUE_ADD, null);
-                            Intent intent = new Intent(context, MakeAlarm.class);
-                            startActivity(intent);
+                        if(view_mode == 5) {
+                            if(gridIndex - 9 >= 0) {
+                                gridIndex = gridIndex - 9;
+                                gridSetting.setGrid(this, gridIndex, GridList);
+                                v.vibrate(cpattern3, -1);
+                            }else {
+                                Toast.makeText(this, "첫번째 페이지입니다.",Toast.LENGTH_SHORT).show();
+                                v.vibrate(cpattern3, -1);
+                            }
                         }
                     }
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    if (e.getPointerCount() == 2) {
-                        stopY = e.getY(0);
-                        stopX = e.getX(0);
-                    } else {
+                    // down to up swipe
+                    else if (startY - stopY > SWIPE_MIN_DISTANCE && Math.abs(startY - stopY) > SWIPE_THRESHOLD_VELOCITY) {
+                        // 설정 메뉴 진입!!!!!
+                        String settinmsg = "설정 메뉴로 진입합니다.";
+                        Toast.makeText(context, settinmsg, Toast.LENGTH_SHORT).show();
+                        tts.speak(settinmsg, TextToSpeech.QUEUE_FLUSH, null);
+                        Intent intent = new Intent(context, SettingActivity.class);
+                        startActivityForResult(intent, REQUEST_CHANGE);
+                    }
+                    // up to down swipe
+                    else if (stopY - startY > SWIPE_MIN_DISTANCE && Math.abs(stopY - startY) > SWIPE_THRESHOLD_VELOCITY) {
+                        // 간단 알람 기능
+                        String makeAlarm = "알람 만들기 진입합니다.";
+                        Toast.makeText(context, "Make Alarm", Toast.LENGTH_SHORT).show();
+                        tts.speak(makeAlarm, TextToSpeech.QUEUE_ADD, null);
+                        Intent intent = new Intent(context, MakeAlarm.class);
+                        startActivity(intent);
+                    }
+                }
+                break;
+            case MotionEvent.ACTION_MOVE:
+                if (e.getPointerCount() == 2) {
+                    stopY = e.getY(0);
+                    stopX = e.getX(0);
+                } else {
+                    if(view_mode == 4) {
                         calculate_theta(e);
                     }
-                    break;
-            }
-        }else if(view_mode == 5) {
-            // 바둑판 모드
+                }
+                break;
         }
+
         return super.onTouchEvent(e);
     }
 
@@ -770,6 +826,42 @@ GoogleApiClient.OnConnectionFailedListener{
     @Override
     public void onInit(int i) {
 
+    }
+
+    public int calculate_grid(double x, double y) {
+        double width = context.getResources().getDisplayMetrics().widthPixels - 32;
+        double height = context.getResources().getDisplayMetrics().heightPixels - 32;
+
+        if(x >= 16 && x <= width/3) {
+            //first column
+            if(y >= 16 && y <= height/3) {
+                return 1;
+            }else if(y >= height/3 && y <= (height/3)*2) {
+                return 4;
+            }else if(y >= (height/3)*2 && y <= height) {
+                return 7;
+            }
+        }else if(x >= width/3 && x <= (width/3)*2) {
+            // second column
+            if(y >= 16 && y <= height/3) {
+                return 2;
+            }else if(y >= height/3 && y <= (height/3)*2) {
+                return 5;
+            }else if(y >= (height/3)*2 && y <= height) {
+                return 8;
+            }
+        }else if(x >= (width/3)*2 && x <= width) {
+            // third column
+            if(y >= 16 && y <= height/3) {
+                return 3;
+            }else if(y >= height/3 && y <= (height/3)*2) {
+                return 6;
+            }else if(y >= (height/3)*2 && y <= height) {
+                return 9;
+            }
+        }
+
+        return 0;
     }
 
 //    public class ScreenOn extends BroadcastReceiver {

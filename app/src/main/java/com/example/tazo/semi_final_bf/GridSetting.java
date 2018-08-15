@@ -26,14 +26,37 @@ public class GridSetting {
     List<ResolveInfo> list;
     ArrayList<String> applist;
 
-    public void getAppList(Context c, int startIndex) {
+    int limit = 0;
+    int gridLimit = 9;
+
+    public int getAppListLimit(Context c) {
         pm = c.getPackageManager();
         Intent intent = new Intent(Intent.ACTION_MAIN, null);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         list = pm.queryIntentActivities(intent, PackageManager.COMPONENT_ENABLED_STATE_DEFAULT);
         applist = new ArrayList<>();
 
-        for(int i = startIndex ; i < startIndex+9 ; i++) {
+        return list.size();
+    }
+
+    public int getLimit(Context c) {
+        if(limit == 0) {
+            limit = getAppListLimit(c);
+        }
+
+        return limit;
+    }
+
+    public void getAppList(Context c, int startIndex) {
+       limit = getAppListLimit(c);
+
+        if(limit > startIndex+9) {
+            gridLimit = 9;
+        }else {
+            gridLimit = limit - startIndex;
+        }
+
+        for(int i = startIndex ; i < startIndex + gridLimit ; i++) {
             ResolveInfo resolveInfo = list.get(i);
             String pName = resolveInfo.activityInfo.applicationInfo.packageName;
             applist.add(pName);
@@ -43,39 +66,29 @@ public class GridSetting {
     public void setGrid(Context c, int startIndex, List<View> viewList) {
         getAppList(c, startIndex);
 
-        for(int i = 0; i < 9; i++) {
-            Drawable d = new Drawable() {
-                @Override
-                public void draw(@NonNull Canvas canvas) {
-
-                }
-
-                @Override
-                public void setAlpha(int alpha) {
-
-                }
-
-                @Override
-                public void setColorFilter(@Nullable ColorFilter colorFilter) {
-
-                }
-
-                @Override
-                public int getOpacity() {
-                    return PixelFormat.UNKNOWN;
-                }
-            };
-
+        for(int i = 0; i < gridLimit; i++) {
+            ImageView iv = (ImageView)viewList.get(i);
             try {
-                d = pm.getApplicationIcon(applist.get(i));
+                Drawable d = pm.getApplicationIcon(applist.get(i));
+                iv.setImageDrawable(d);
 
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }
-
-            ImageView iv = (ImageView)viewList.get(i);
-            iv.setImageDrawable(d);
         }
+    }
 
+    public String getGridIconName(int iconNum) {
+        ResolveInfo resolveInfo = list.get(iconNum);
+        String iconName = resolveInfo.activityInfo.applicationInfo.loadLabel(pm).toString();
+
+        return iconName;
+    }
+
+    public String getGridIconPName(int iconNum) {
+        ResolveInfo resolveInfo = list.get(iconNum);
+        String pName = resolveInfo.activityInfo.applicationInfo.packageName;
+
+        return pName;
     }
 }
