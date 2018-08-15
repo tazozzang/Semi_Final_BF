@@ -20,6 +20,9 @@ public class DB_Handler extends SQLiteOpenHelper{
     public static final String COLUMN_ICON_NUM = "inum";
     public static final String COLUMN_PACKAGE_NAME = "packageName";
 
+    public static final String DATABASE_TABLE_2 = "mode";
+    public static final String COLUMN_MODE_NUM = "mnum";
+
     public DB_Handler(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, DATABASE_NAME, factory, version);
     }
@@ -28,6 +31,12 @@ public class DB_Handler extends SQLiteOpenHelper{
     public void onCreate(SQLiteDatabase db) {
         // 1. DB 생성
         String CREATE_TABLE = "create table if not exists "
+                +DATABASE_TABLE_2
+                +"(" + COLUMN_ID + " integer primary key,"
+                + COLUMN_MODE_NUM + " integer)";
+        db.execSQL(CREATE_TABLE);
+
+        CREATE_TABLE = "create table if not exists "
                 +DATABASE_TABLE
                 +"("+ COLUMN_ID+" integer primary key autoincrement,"
                 +COLUMN_CONTROLLER_NUM + " integer,"
@@ -47,6 +56,37 @@ public class DB_Handler extends SQLiteOpenHelper{
         // 위의 객체 생성후 db 와 TABLE 이 생성
 
         return handler;
+    }
+
+    public int updateMode(int mode) {
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_MODE_NUM, mode);
+        SQLiteDatabase db = this.getWritableDatabase();
+        int result = db.update(DATABASE_TABLE_2, values, COLUMN_ID+"=0", null);
+        db.close();
+        return result;
+    }
+
+    public int getMode() {
+        int result = -1;
+        String query = "select * from "+DATABASE_TABLE_2 + " where "+COLUMN_ID+" = 0";
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor c = db.rawQuery(query, null);
+        if(c.moveToFirst()) {
+            result = c.getInt(1);
+            c.close();
+        }
+        return result;
+    }
+
+    public long setMode(int mode) {
+        ContentValues v = new ContentValues();
+        v.put(COLUMN_ID, 0);
+        v.put(COLUMN_MODE_NUM, mode);
+        SQLiteDatabase db = this.getWritableDatabase();
+        long result = db.insert(DATABASE_TABLE_2,null,v);
+        db.close();
+        return result;
     }
 
     public long addIcon(int cnum, int num, String pName) {

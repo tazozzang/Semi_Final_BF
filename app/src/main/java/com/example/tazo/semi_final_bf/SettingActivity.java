@@ -239,11 +239,6 @@ public class SettingActivity extends Activity implements TextToSpeech.OnInitList
                 setResult(5, returnIntent);
                 finish();
             }
-            if(resultCode == 6) {
-                Intent returnIntent = new Intent();
-                setResult(6, returnIntent);
-                finish();
-            }
         }
     }
 

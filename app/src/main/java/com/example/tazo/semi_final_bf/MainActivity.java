@@ -18,6 +18,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -27,6 +29,11 @@ import com.google.android.gms.common.api.Result;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.Wearable;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 
 public class MainActivity extends Activity implements TextToSpeech.OnInitListener, GoogleApiClient.ConnectionCallbacks,
@@ -41,8 +48,13 @@ GoogleApiClient.OnConnectionFailedListener{
     double theta; // startPoint와 currentPoint 벡터의 사이각
     double ztheta; // theta 계산시 사용
 
-    // 컨트롤러 모드(4), 바둑판 모드(5), 자동 롤링 모드(6)
+    // 컨트롤러 모드(4), 바둑판 모드(5)
     int view_mode = 4;
+
+    // 바둑판 배열
+    GridSetting gridSetting;
+    int gridIndex = 0;
+    List<View> GridList;
 
     // 컨트롤러 배열과 현재 화면에 있는 컨트롤러 번호 저장.
     Controller[] controllers = new Controller[3];
@@ -72,7 +84,6 @@ GoogleApiClient.OnConnectionFailedListener{
     int REQUEST_RETURN = 2;
     int REQUEST_CONTROLLER_MODE = 4;
     int REQUEST_GRID_MODE = 5;
-    int REQUEST_AUTO_ROLLING_MODE = 6;
 
     final long[] cpattern3 = new long[]{200,70,100,25,200,50};
 
@@ -170,7 +181,47 @@ GoogleApiClient.OnConnectionFailedListener{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        db_handler = DB_Handler.open(this);
+        view_mode = db_handler.getMode();
+
+        GridList = new ArrayList<>();
+        gridSetting = new GridSetting();
+
+        if(view_mode == 4) {
+            setContentView(R.layout.activity_main);
+        }else if(view_mode == 5) {
+            setContentView(R.layout.activity_grid_main);
+
+            GridList.add(findViewById(R.id.oneone));
+            GridList.add(findViewById(R.id.onetwo));
+            GridList.add(findViewById(R.id.onethree));
+            GridList.add(findViewById(R.id.twoone));
+            GridList.add(findViewById(R.id.twotwo));
+            GridList.add(findViewById(R.id.twothree));
+            GridList.add(findViewById(R.id.threeone));
+            GridList.add(findViewById(R.id.threetwo));
+            GridList.add(findViewById(R.id.threethree));
+
+            gridSetting.setGrid(this, gridIndex, GridList);
+//            ImageView iv = (ImageView)findViewById(R.id.oneone);
+//            iv.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    view_mode = 4;
+//                    setContentView(R.layout.activity_main);
+//                    // 잠시 모드를 바꿀 수 있는 용도로 쓸 것임
+//                }
+//            });
+
+        }else {
+            // DB에 저장된 view mode가 없음
+            view_mode = 4; // 기본 모드는 컨트롤러 모드
+            long result = db_handler.setMode(view_mode);
+            if(result == -1) {
+                Toast.makeText(this, "DB ERROR!!",Toast.LENGTH_LONG).show();
+            }
+            setContentView(R.layout.activity_main);
+        }
 
         googleApiClient = new GoogleApiClient.Builder(this).addApi(Wearable.API)
                 .addConnectionCallbacks(this)
@@ -196,13 +247,13 @@ GoogleApiClient.OnConnectionFailedListener{
         v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         // DB
-        db_handler = DB_Handler.open(this);
         currentController = 0;
         controllerNum = db_handler.howManyController();
         for(int i = 0; i < controllerNum; i ++) {
             controllers[i] = new Controller(context, i+1);
         }
         db_handler.addIcon(1,1,"spotmemo");
+
         center_x = controllers[currentController].centerX;
         center_y = controllers[currentController].centerY;
 
@@ -474,22 +525,26 @@ GoogleApiClient.OnConnectionFailedListener{
             if(resultCode == REQUEST_CONTROLLER_MODE) {
                 // resultCode == 4 : 컨트롤러 모드 변경했을 때 적용해야 될 부분
                 view_mode = 4;
-                setContentView(R.layout.activity_main);
-                tts.speak("메인 화면에 진입하였습니다. 컨트롤러 모드로 변경되었습니다.",TextToSpeech.QUEUE_FLUSH,null);
-                v.vibrate(cpattern3,-1);
+                int result = db_handler.updateMode(view_mode);
+                if(result != -1) {
+                    setContentView(R.layout.activity_main);
+                    tts.speak("메인 화면에 진입하였습니다. 컨트롤러 모드로 변경되었습니다.", TextToSpeech.QUEUE_FLUSH, null);
+                    v.vibrate(cpattern3, -1);
+                }else {
+                    Toast.makeText(this,"Mode Setting Error!!",Toast.LENGTH_SHORT).show();
+                }
             }
             if(resultCode == REQUEST_GRID_MODE) {
                 // resultCode == 5 : 바둑판 모드 변경했을 때 적용해야 될 부분
                 view_mode = 5;
-                setContentView(R.layout.activity_grid_main);
-                tts.speak("메인 화면에 진입하였습니다. 바둑판 모드로 변경되었습니다.",TextToSpeech.QUEUE_FLUSH,null);
-                v.vibrate(cpattern3,-1);
-            }
-            if(resultCode == REQUEST_AUTO_ROLLING_MODE) {
-                // resultCode == 6 : 자동 롤링 모드 변경했을 때 적용해야 될 부분
-                view_mode = 6;
-                tts.speak("메인 화면에 진입하였습니다. 자동 롤링 모드로 변경되었습니다.",TextToSpeech.QUEUE_FLUSH,null);
-                v.vibrate(cpattern3,-1);
+                int result = db_handler.updateMode(view_mode);
+                if(result != -1) {
+                    setContentView(R.layout.activity_grid_main);
+                    tts.speak("메인 화면에 진입하였습니다. 격자 모드로 변경되었습니다.", TextToSpeech.QUEUE_FLUSH, null);
+                    v.vibrate(cpattern3, -1);
+                }else {
+                    Toast.makeText(this,"Mode Setting Error!!",Toast.LENGTH_SHORT).show();
+                }
             }
         }
 
@@ -642,8 +697,6 @@ GoogleApiClient.OnConnectionFailedListener{
             }
         }else if(view_mode == 5) {
             // 바둑판 모드
-        }else if(view_mode == 6) {
-            // 자동 롤링 모드
         }
         return super.onTouchEvent(e);
     }
