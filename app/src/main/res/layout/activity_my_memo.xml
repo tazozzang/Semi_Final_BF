@@ -5,15 +5,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:weightSum="1"
     tools:context="com.example.tazo.semi_final_bf.MyMemoActivity">
 
-    <ListView
-
+    <LinearLayout
+        android:layout_weight="0.6"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/mlistView"/>
+        android:layout_height="400dp">
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/mlistView"/>
+    </LinearLayout>
+
 
     <Button
+        android:layout_weight="0.1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="20dp"
