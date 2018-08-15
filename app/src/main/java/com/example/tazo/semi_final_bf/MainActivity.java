@@ -29,6 +29,11 @@ import com.google.android.gms.common.api.Result;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.Wearable;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 
 public class MainActivity extends Activity implements TextToSpeech.OnInitListener, GoogleApiClient.ConnectionCallbacks,
@@ -45,6 +50,11 @@ GoogleApiClient.OnConnectionFailedListener{
 
     // 컨트롤러 모드(4), 바둑판 모드(5)
     int view_mode = 4;
+
+    // 바둑판 배열
+    GridSetting gridSetting;
+    int gridIndex = 0;
+    List<View> GridList;
 
     // 컨트롤러 배열과 현재 화면에 있는 컨트롤러 번호 저장.
     Controller[] controllers = new Controller[3];
@@ -173,19 +183,35 @@ GoogleApiClient.OnConnectionFailedListener{
         super.onCreate(savedInstanceState);
         db_handler = DB_Handler.open(this);
         view_mode = db_handler.getMode();
+
+        GridList = new ArrayList<>();
+        gridSetting = new GridSetting();
+
         if(view_mode == 4) {
             setContentView(R.layout.activity_main);
         }else if(view_mode == 5) {
             setContentView(R.layout.activity_grid_main);
-            ImageView iv = (ImageView)findViewById(R.id.oneone);
-            iv.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    view_mode = 4;
-                    setContentView(R.layout.activity_main);
-                    // 잠시 모드를 바꿀 수 있는 용도로 쓸 것임
-                }
-            });
+
+            GridList.add(findViewById(R.id.oneone));
+            GridList.add(findViewById(R.id.onetwo));
+            GridList.add(findViewById(R.id.onethree));
+            GridList.add(findViewById(R.id.twoone));
+            GridList.add(findViewById(R.id.twotwo));
+            GridList.add(findViewById(R.id.twothree));
+            GridList.add(findViewById(R.id.threeone));
+            GridList.add(findViewById(R.id.threetwo));
+            GridList.add(findViewById(R.id.threethree));
+
+            gridSetting.setGrid(this, gridIndex, GridList);
+//            ImageView iv = (ImageView)findViewById(R.id.oneone);
+//            iv.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    view_mode = 4;
+//                    setContentView(R.layout.activity_main);
+//                    // 잠시 모드를 바꿀 수 있는 용도로 쓸 것임
+//                }
+//            });
 
         }else {
             // DB에 저장된 view mode가 없음
@@ -227,6 +253,7 @@ GoogleApiClient.OnConnectionFailedListener{
             controllers[i] = new Controller(context, i+1);
         }
         db_handler.addIcon(1,1,"spotmemo");
+
         center_x = controllers[currentController].centerX;
         center_y = controllers[currentController].centerY;
 
