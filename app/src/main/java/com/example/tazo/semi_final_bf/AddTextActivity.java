@@ -8,6 +8,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -21,6 +27,10 @@ public class AddTextActivity extends AppCompatActivity implements  TextToSpeech.
     CharSequence place_name;
     String pre_token; // 토큰 끊기전
     String[] token; // 토큰 끊은 후
+
+    private FirebaseDatabase firebaseDatabase;
+    private DatabaseReference databaseReference;
+    private ChildEventListener childEventListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +47,9 @@ public class AddTextActivity extends AppCompatActivity implements  TextToSpeech.
         //token[1] = latitude
         //token[2] = longitude
         //token[3] = 0 -> 공유 안 함 / 1 -> 공유 함
+        //token[4] = (n) -> 같은 위치에 몇 개의 메모가 있는 지
+
+        initFirebaseDatabase();
 
         Text = (EditText)findViewById(R.id.TextMemo);
         tts = new TextToSpeech(this,this);
@@ -45,6 +58,33 @@ public class AddTextActivity extends AppCompatActivity implements  TextToSpeech.
         Intent i = new Intent(this, AddMemoActivity.class);
         finish();
         startActivity(i);
+    }
+
+    private void initFirebaseDatabase() {
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = firebaseDatabase.getReference("message");
+        childEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        };
+        databaseReference.addChildEventListener(childEventListener);
     }
 
     public void onSaveTextMemo(View v) {
@@ -56,10 +96,18 @@ public class AddTextActivity extends AppCompatActivity implements  TextToSpeech.
 
             boolean f = nfile.mkdirs();
 
-            File file = new File(nfile.getAbsolutePath() + "/" + place_name + "-(0).txt");
+            String message = nfile.getAbsolutePath() + "/" + place_name + "-(0).txt";
+            File file = new File(message);
             int i = 1;
-            while(file.exists()) {
-                file = new File(nfile.getAbsolutePath()+"/"+place_name+"-("+(i++)+").txt");
+            if(file.exists()){
+                while(file.exists()) {
+                    message = nfile.getAbsolutePath()+"/"+place_name+"-("+(i++)+").txt";
+                    file = new File(message);
+                    databaseReference.push().setValue(message); // 파일 저장명만 디비에 올리기
+                }
+            }
+            else{
+                databaseReference.push().setValue(message); // 파일 저장명만 디비에 올리기
             }
 
             FileWriter fw = null;
@@ -99,4 +147,9 @@ public class AddTextActivity extends AppCompatActivity implements  TextToSpeech.
         tts.speak(nar,TextToSpeech.QUEUE_FLUSH,null);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        databaseReference.removeEventListener(childEventListener);
+    }
 }

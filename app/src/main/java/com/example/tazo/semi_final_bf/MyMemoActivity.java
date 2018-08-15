@@ -43,7 +43,11 @@ public class MyMemoActivity extends AppCompatActivity  implements TextToSpeech.O
             if (files.listFiles().length > 0 ){
                 for (File file:files.listFiles()){
                     // 음성 메모이면 0
-                    fName.add(file.getName());
+//                    String name_split[] = file.getName().split("-");
+                    String name_split[] = file.getName().split("-");
+                    String num_split[] = name_split[4].split("\\.");
+                    fName.add(name_split[0]+"에 저장된 " + num_split[0]+"번째 메모");
+                    //+ name_split[3] + "번 카테고리 "
                     fPath.add(file.getAbsolutePath());
                     fType.add(0);
                 }
@@ -52,7 +56,9 @@ public class MyMemoActivity extends AppCompatActivity  implements TextToSpeech.O
             if (files.listFiles().length > 0){
                 for (File file:files.listFiles()){
                     // 텍스트 메모이면 1
-                    fName.add(file.getName());
+                    String name_split[] = file.getName().split("-");
+                    String num_split[] = name_split[4].split("\\.");
+                    fName.add(name_split[0]+"에 저장된 "  + num_split[0]+"번째 메모");
                     fPath.add(file.getAbsolutePath());
                     fType.add(1);
                 }
@@ -66,7 +72,6 @@ public class MyMemoActivity extends AppCompatActivity  implements TextToSpeech.O
                     if(fType.get(position) == 0) {
                         // 음성 파일이면 재생
                         i.putExtra("type",0);
-
                         i.putExtra("file",fPath.get(position));
                         startActivity(i);
                     }else {
