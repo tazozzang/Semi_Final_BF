@@ -17,49 +17,40 @@
 
         <ImageView
             android:id="@+id/oneone"
-            android:src="@drawable/ic_media_play_light"
             android:layout_columnWeight="1"
             android:layout_rowWeight="1"/>
         <ImageView
             android:id="@+id/onetwo"
-            android:src="@drawable/ic_audiotrack_light"
             android:layout_columnWeight="1"
             android:layout_rowWeight="1"/>
         <ImageView
             android:id="@+id/onethree"
-            android:src="@drawable/ic_audiotrack_light"
             android:layout_columnWeight="1"
             android:layout_rowWeight="1"/>
 
         <ImageView
             android:id="@+id/twoone"
-            android:src="@drawable/ic_audiotrack_light"
             android:layout_columnWeight="1"
             android:layout_rowWeight="1"/>
         <ImageView
             android:id="@+id/twotwo"
-            android:src="@drawable/ic_audiotrack_light"
             android:layout_columnWeight="1"
             android:layout_rowWeight="1"/>
         <ImageView
             android:id="@+id/twothree"
-            android:src="@drawable/ic_audiotrack_light"
             android:layout_columnWeight="1"
             android:layout_rowWeight="1"/>
 
         <ImageView
             android:id="@+id/threeone"
-            android:src="@drawable/ic_audiotrack_light"
             android:layout_columnWeight="1"
             android:layout_rowWeight="1"/>
         <ImageView
             android:id="@+id/threetwo"
-            android:src="@drawable/ic_audiotrack_light"
             android:layout_columnWeight="1"
             android:layout_rowWeight="1"/>
         <ImageView
             android:id="@+id/threethree"
-            android:src="@drawable/ic_audiotrack_light"
             android:layout_columnWeight="1"
             android:layout_rowWeight="1"/>
     </GridLayout>

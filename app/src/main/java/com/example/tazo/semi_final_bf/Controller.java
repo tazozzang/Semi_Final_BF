@@ -162,6 +162,7 @@ public class Controller {
         if(bicon1) {
             if(controllernum == 1) {
                 Intent intent1 = new Intent(context, SM_main.class);
+                intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent1);
 
                 // !--- 여기에 스팟메모 실행 코드 추가 ---
