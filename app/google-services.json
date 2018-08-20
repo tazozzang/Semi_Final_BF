@@ -1,20 +1,21 @@
 {
   "project_info": {
-    "project_number": "209863217241",
-    "firebase_url": "https://finalfinal-1348.firebaseio.com",
-    "project_id": "finalfinal-1348"
+    "project_number": "409921518976",
+    "firebase_url": "https://forfinal-q-ring.firebaseio.com",
+    "project_id": "forfinal-q-ring",
+    "storage_bucket": "forfinal-q-ring.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:209863217241:android:0dd5349e2c1b5e50",
+        "mobilesdk_app_id": "1:409921518976:android:0dd5349e2c1b5e50",
         "android_client_info": {
           "package_name": "com.example.tazo.semi_final_bf"
         }
       },
       "oauth_client": [
         {
-          "client_id": "209863217241-g8sl255ubfgi44vv0jit19aelj139qla.apps.googleusercontent.com",
+          "client_id": "409921518976-17hs6vrmsmei3b0h5orqaa94nerbnm2s.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.tazo.semi_final_bf",
@@ -22,13 +23,13 @@
           }
         },
         {
-          "client_id": "209863217241-1el5a3jg4d00j1if6hpcubnce0u6p7vb.apps.googleusercontent.com",
+          "client_id": "409921518976-oagvt00ahmrbv3qi1n4fcm2td9bg1j2l.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCamgKF6BJjht723omWSxem-1e2P8IFxRA"
+          "current_key": "AIzaSyADk3ZNwDQjwmoLiLCyFKNsAUgRZ3MZR44"
         }
       ],
       "services": {
@@ -39,7 +40,7 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "209863217241-1el5a3jg4d00j1if6hpcubnce0u6p7vb.apps.googleusercontent.com",
+              "client_id": "409921518976-oagvt00ahmrbv3qi1n4fcm2td9bg1j2l.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

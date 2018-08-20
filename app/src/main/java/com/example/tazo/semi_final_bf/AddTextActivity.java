@@ -1,18 +1,26 @@
 package com.example.tazo.semi_final_bf;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.speech.tts.TextToSpeech;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -31,6 +39,11 @@ public class AddTextActivity extends AppCompatActivity implements  TextToSpeech.
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
     private ChildEventListener childEventListener;
+
+    FirebaseStorage storage;
+    StorageReference storageReference;
+    UploadTask uploadTask;
+    Uri uri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +74,7 @@ public class AddTextActivity extends AppCompatActivity implements  TextToSpeech.
     }
 
     private void initFirebaseDatabase() {
+
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference("message");
         childEventListener = new ChildEventListener() {
@@ -85,6 +99,10 @@ public class AddTextActivity extends AppCompatActivity implements  TextToSpeech.
             }
         };
         databaseReference.addChildEventListener(childEventListener);
+
+
+       storage = FirebaseStorage.getInstance();
+       storageReference = storage.getReference();
     }
 
     public void onSaveTextMemo(View v) {
@@ -125,6 +143,26 @@ public class AddTextActivity extends AppCompatActivity implements  TextToSpeech.
             try {
                 if(buf != null) {
                     buf.close();
+
+                    uri = Uri.fromFile(file);
+                    StorageReference uploadRef = storageReference.child("SF_SM/Text/" + file.getName());
+                    uploadTask = uploadRef.putFile(uri);
+                    uploadTask
+                            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                    Uri downloadUri = taskSnapshot.getDownloadUrl();
+                                    //Toast.makeText(getApplicationContext(),downloadUri.toString(),Toast.LENGTH_LONG).show();
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+
+                                    Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_LONG).show();
+                                }
+                            });
+
                     nar = "저장이 완료되었습니다. 메인으로 돌아갑니다.";
                     onInit(0);
                     startActivity(new Intent(this, MainActivity.class));

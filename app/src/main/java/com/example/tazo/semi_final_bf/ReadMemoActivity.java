@@ -132,7 +132,7 @@ public class ReadMemoActivity extends AppCompatActivity implements TextToSpeech.
                             FileInputStream fin = new FileInputStream(f);
                             byte b[] = new byte[(int)f.length()];
                             fin.read(b);
-                            File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SpotMemo/Voice/");
+                            File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SF_SM/Voice/");
                             File file = new File(nfile.getAbsolutePath() + "/" + change_name + ".mp4");
 
                             FileOutputStream fo = new FileOutputStream(file);
@@ -151,7 +151,7 @@ public class ReadMemoActivity extends AppCompatActivity implements TextToSpeech.
                         finish();
                         startActivity(i);
                     }else if(type ==1){
-                        File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SpotMemo/Text/");
+                        File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SF_SM/Text/");
                         File file = new File(nfile.getAbsolutePath() + "/" + change_name + ".txt");
 
                         FileWriter fw = null;
@@ -184,7 +184,7 @@ public class ReadMemoActivity extends AppCompatActivity implements TextToSpeech.
                             FileInputStream fin = new FileInputStream(f);
                             byte b[] = new byte[(int)f.length()];
                             fin.read(b);
-                            File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SpotMemo/Voice/");
+                            File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SF_SM/Voice/");
                             File file = new File(nfile.getAbsolutePath() + "/" + change_name + ".mp4");
 
                             FileOutputStream fo = new FileOutputStream(file);
@@ -203,7 +203,7 @@ public class ReadMemoActivity extends AppCompatActivity implements TextToSpeech.
                         finish();
                         startActivity(i);
                     }else if(type ==1){
-                        File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SpotMemo/Text/");
+                        File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SF_SM/Text/");
                         File file = new File(nfile.getAbsolutePath() + "/" + change_name + ".txt");
                         FileWriter fw = null;
                         BufferedWriter buf = null;
@@ -235,7 +235,7 @@ public class ReadMemoActivity extends AppCompatActivity implements TextToSpeech.
                             FileInputStream fin = new FileInputStream(f);
                             byte b[] = new byte[(int)f.length()];
                             fin.read(b);
-                            File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SpotMemo/Voice/");
+                            File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SF_SM/Voice/");
                             File file = new File(nfile.getAbsolutePath() + "/" + change_name + ".mp4");
 
                             FileOutputStream fo = new FileOutputStream(file);
@@ -254,7 +254,7 @@ public class ReadMemoActivity extends AppCompatActivity implements TextToSpeech.
                         finish();
                         startActivity(i);
                     }else if(type ==1){
-                        File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SpotMemo/Text/");
+                        File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SF_SM/Text/");
                         File file = new File(nfile.getAbsolutePath() + "/" + change_name + ".txt");
 
                         FileWriter fw = null;
@@ -287,7 +287,7 @@ public class ReadMemoActivity extends AppCompatActivity implements TextToSpeech.
                             FileInputStream fin = new FileInputStream(f);
                             byte b[] = new byte[(int)f.length()];
                             fin.read(b);
-                            File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SpotMemo/Voice/");
+                            File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SF_SM/Voice/");
                             File file = new File(nfile.getAbsolutePath() + "/" + change_name + ".mp4");
 
                             FileOutputStream fo = new FileOutputStream(file);
@@ -306,7 +306,7 @@ public class ReadMemoActivity extends AppCompatActivity implements TextToSpeech.
                         finish();
                         startActivity(i);
                     }else if(type ==1){
-                        File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SpotMemo/Text/");
+                        File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SF_SM/Text/");
                         File file = new File(nfile.getAbsolutePath() + "/" + change_name + ".txt");
 
                         FileWriter fw = null;
@@ -339,7 +339,7 @@ public class ReadMemoActivity extends AppCompatActivity implements TextToSpeech.
                             FileInputStream fin = new FileInputStream(f);
                             byte b[] = new byte[(int)f.length()];
                             fin.read(b);
-                            File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SpotMemo/Voice/");
+                            File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SF_SM/Voice/");
                             File file = new File(nfile.getAbsolutePath() + "/" + change_name + ".mp4");
 
                             FileOutputStream fo = new FileOutputStream(file);
@@ -358,7 +358,7 @@ public class ReadMemoActivity extends AppCompatActivity implements TextToSpeech.
                         finish();
                         startActivity(i);
                     }else if(type ==1){
-                        File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SpotMemo/Text/");
+                        File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SF_SM/Text/");
                         File file = new File(nfile.getAbsolutePath() + "/" + change_name + ".txt");
 
                         FileWriter fw = null;
@@ -391,7 +391,7 @@ public class ReadMemoActivity extends AppCompatActivity implements TextToSpeech.
                             FileInputStream fin = new FileInputStream(f);
                             byte b[] = new byte[(int)f.length()];
                             fin.read(b);
-                            File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SpotMemo/Voice/");
+                            File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SF_SM/Voice/");
                             File file = new File(nfile.getAbsolutePath() + "/" + change_name + ".mp4");
 
                             FileOutputStream fo = new FileOutputStream(file);
@@ -410,7 +410,7 @@ public class ReadMemoActivity extends AppCompatActivity implements TextToSpeech.
                         finish();
                         startActivity(i);
                     }else if(type ==1){
-                        File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SpotMemo/Text/");
+                        File nfile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "SF_SM/Text/");
                         File file = new File(nfile.getAbsolutePath() + "/" + change_name + ".txt");
 
                         FileWriter fw = null;
