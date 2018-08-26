@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.os.Vibrator;
 import android.provider.CallLog;
 import android.provider.Telephony;
@@ -17,9 +18,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -30,15 +31,18 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.Wearable;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Locale;
 
 public class MainActivity extends Activity implements TextToSpeech.OnInitListener, GoogleApiClient.ConnectionCallbacks,
 GoogleApiClient.OnConnectionFailedListener{
-
+    //*[자동 롤링]에 쓰는 변수들
+    private static final int TIMER_START = 10;
+    private static final int TIMER_STOP = 11;
+    private static final int TIMER_REPEAT = 12;
+    private static final int TIME_DElAY = 700;//검사 시간 간격.
+    private TimeCounter timeCounter = new TimeCounter();
+    //*/////////////////////
 
     private GoogleApiClient googleApiClient;
 
@@ -58,6 +62,7 @@ GoogleApiClient.OnConnectionFailedListener{
 
     String focusedName = null; // 현재 포커싱 된 아이콘의 이름
     String focusedPName = null; // 현재 포커싱 된 아이콘의 패키지명
+    int focusedNum = 0; //포커싱 된 아이콘 번호.( 현재 페이지 기준 0~8)
 
     // 컨트롤러 배열과 현재 화면에 있는 컨트롤러 번호 저장.
     Controller[] controllers = new Controller[3];
@@ -566,20 +571,50 @@ GoogleApiClient.OnConnectionFailedListener{
 
     }
 
+    // [자동 롤링] 타이머 증가할 때마다 앱 번호 가져오는 함수.
+    public void onTimeWork(int count){
+        /**
+         * gridIndex : 현재 페이지 첫번째 앱의 번호.
+         * totalAppNum : 전체 앱 개수.
+         */
+        //앱개수로 나눳을 때 나머지
+        //현재 페이지에 앱이 몇개인지 아는 방법: totalAppNum >= gridIndex + 9 == true 면 9개. 아니면 totalAppNum - gridIndex개.
+        int appNum  = 0;
+        int totalAppNum = gridSetting.gridLimit;
+        if(totalAppNum >= gridIndex + 9){
+            appNum = 9;
+        }else{
+            appNum = totalAppNum - gridIndex;
+        }
+        int number = count%appNum;
+        if(focusedNum != number) {
+            //포커스을 바꿔줌
+            focusedNum = number;
+            Log.d("test","Focused num - auto: "+focusedNum);
+            //Toast.makeText(getApplicationContext(),"Focused num: "+focusedNum,Toast.LENGTH_SHORT).show();
+            focusedName = gridSetting.getGridIconName(gridIndex + focusedNum);
+            focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum);
+        }
+    }
+
     public boolean onTouchEvent(MotionEvent e) {
 
         switch (e.getActionMasked() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
+                        timeCounter.sendEmptyMessage(TIMER_START);
                 sx = e.getX();
                 sy = e.getY();
                 swipe_mode = none;
                 if(view_mode == 4) {
                     if (e.getPointerCount() == 1) {
                         controllers[currentController].actionDown(e);
+                        //[자동 롤링] 타이머 시~작
                     }
                 }
                 break;
             case MotionEvent.ACTION_UP:
+                //[자동 롤링] 롱프레스 타이머 끝.
+                timeCounter.sendEmptyMessage(TIMER_STOP);
                 if (e.getPointerCount() == 1) {
                     if (swipe_mode != swipe) {
                         clickCount++;
@@ -597,9 +632,12 @@ GoogleApiClient.OnConnectionFailedListener{
                                     }
                                 }else {
                                     // 아이콘 포커스
-                                    int iconSelected = calculate_grid(sx,sy);
-                                    focusedName = gridSetting.getGridIconName(gridIndex + iconSelected - 1);
-                                    focusedPName = gridSetting.getGridIconPName(gridIndex + iconSelected - 1);
+                                    focusedNum = calculate_grid(sx,sy) - 1;
+                                    focusedName = gridSetting.getGridIconName(gridIndex + focusedNum);
+                                    focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum);
+                                    Log.d("test","Focused num"+focusedNum);
+                                    // [자동 롤링] 현재 포커스 숫자를 바꿈.
+                                    timeCounter.changeFocusedNum(focusedNum-1);
                                 }
                             }
                         }, 200);
@@ -627,6 +665,7 @@ GoogleApiClient.OnConnectionFailedListener{
                                 }
                             }else {
                                 // 포커스 된 아이콘 실행
+                                timeCounter.sendEmptyMessage(TIMER_STOP);
                                 Intent fi = pm.getLaunchIntentForPackage(focusedPName);
                                 startActivity(fi);
                             }
@@ -876,4 +915,43 @@ GoogleApiClient.OnConnectionFailedListener{
 //            }
 //        }
 //    } // 잠금화면에서 읽는 듯한 코드
+
+    //[자동 롤링]에 쓰는 타이머 클래스.
+    class TimeCounter extends Handler {
+        int count_;
+
+        TimeCounter(int count){
+            count_ = count;
+        }
+
+        TimeCounter(){
+            count_ = 0;
+        }
+
+        public void changeFocusedNum(int num){
+            count_ = num;
+        }
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case TIMER_START:
+                    this.removeMessages(TIMER_REPEAT);
+                    Log.d("timerhandler", "timer start!");
+                    this.sendEmptyMessageDelayed(TIMER_REPEAT,TIME_DElAY);
+                    break;
+                case TIMER_REPEAT:
+                    count_++;
+                    //temp
+                    Log.d("timehandler","Time count: "+count_);
+                    onTimeWork(count_);
+                    this.sendEmptyMessageDelayed(TIMER_REPEAT,TIME_DElAY);
+                    break;
+                case TIMER_STOP:
+                    Log.d("timehandler","timer stop!!!");
+                    this.removeMessages(TIMER_REPEAT);
+                    break;
+            }
+            super.handleMessage(msg);
+        }
+    }
 }
