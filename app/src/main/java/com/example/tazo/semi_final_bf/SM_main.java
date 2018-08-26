@@ -200,7 +200,7 @@ public class SM_main extends AppCompatActivity implements com.google.android.gms
             @Override
             public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
                 for (PlaceLikelihood placeLikelihood : likelyPlaces) {
-                    place_info = new Place_Info( placeLikelihood.getPlace().getName(),placeLikelihood.getPlace().getLatLng());
+                    place_info = new Place_Info( placeLikelihood.getPlace().getName(),placeLikelihood.getPlace().getLatLng(),placeLikelihood.getPlace().getPlaceTypes());
                     place_name.add(place_info);
                 }
                 likelyPlaces.release();

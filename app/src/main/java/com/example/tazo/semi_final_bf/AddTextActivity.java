@@ -59,7 +59,7 @@ public class AddTextActivity extends AppCompatActivity implements  TextToSpeech.
         //token[0] = 장소 이름
         //token[1] = latitude
         //token[2] = longitude
-        //token[3] = 0 -> 공유 안 함 / 1 -> 공유 함
+        //token[3] = 0 -> 공유 안 함 / 카테고리
         //token[4] = (n) -> 같은 위치에 몇 개의 메모가 있는 지
 
         initFirebaseDatabase();
@@ -115,17 +115,19 @@ public class AddTextActivity extends AppCompatActivity implements  TextToSpeech.
             boolean f = nfile.mkdirs();
 
             String message = nfile.getAbsolutePath() + "/" + place_name + "-(0).txt";
+            String dbname = "gs://forfinal-q-ring.appspot.com/SF_SM/Text/"+place_name+"-(0).txt";
             File file = new File(message);
             int i = 1;
             if(file.exists()){
                 while(file.exists()) {
                     message = nfile.getAbsolutePath()+"/"+place_name+"-("+(i++)+").txt";
                     file = new File(message);
-                    databaseReference.push().setValue(message); // 파일 저장명만 디비에 올리기
+                    dbname = "gs://forfinal-q-ring.appspot.com/SF_SM/Text/"+place_name+"-("+(i++)+").txt";
+                    databaseReference.push().setValue(dbname); // 파일 저장명만 디비에 올리기
                 }
             }
             else{
-                databaseReference.push().setValue(message); // 파일 저장명만 디비에 올리기
+                databaseReference.push().setValue(dbname); // 파일 저장명만 디비에 올리기
             }
 
             FileWriter fw = null;

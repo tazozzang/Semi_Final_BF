@@ -12,7 +12,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
-import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -66,47 +65,6 @@ public class MakeAlarm extends AppCompatActivity  implements TextToSpeech.OnInit
 
     final long[] alarm_vib = {500, 1000};
 
-
-    public void showvib(View view){
-        switch (view.getId()){
-            case R.id.viba:
-                onDontVibrate();
-                vibrator.vibrate(pattern_ms,-1);
-                break;
-            case R.id.vibb:
-                onDontVibrate();
-                vibrator.vibrate(pattern_cll,-1);
-                break;
-            case R.id.vibc:
-                onDontVibrate();
-                vibrator.vibrate(pattern_mscl,-1);
-                break;
-
-            case R.id.vibe:
-                onKnowVibrate();
-                vibrator.vibrate(pattern_ms,-1);
-                break;
-            case R.id.vibf:
-                onKnowVibrate();
-                vibrator.vibrate(pattern_cll,-1);
-                break;
-            case R.id.vibg:
-                onKnowVibrate();
-                vibrator.vibrate(pattern_mscl,-1);
-                break;
-
-
-            case R.id.vibd:
-                onGiveAlarm();
-                vibrator.vibrate(alarm_vib,0);
-                break;
-            case R.id.cancelvib:
-                onGiveCancel();
-                vibrator.cancel();
-                break;
-        }
-
-    }
 
     @Override
     protected void onStart() {
@@ -264,6 +222,7 @@ public class MakeAlarm extends AppCompatActivity  implements TextToSpeech.OnInit
                     //Toast.makeText(getApplicationContext(), setT, Toast .LENGTH_SHORT).show();
                     new AlarmHATT(getApplicationContext()).Alarm(timePicker.getCurrentHour(), timePicker.getCurrentMinute());
                     finish();
+                    overridePendingTransition(0,0); // finish animation 없애줌
 
                 return false;
             }
@@ -312,6 +271,7 @@ public class MakeAlarm extends AppCompatActivity  implements TextToSpeech.OnInit
         public void Alarm(int time_of_day, int minute){
             AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
             Intent intent = new Intent(MakeAlarm.this, BroadcastD.class);
+
             PendingIntent sender = PendingIntent.getBroadcast(MakeAlarm.this, 0, intent, 0);
 
             Calendar calendar = Calendar.getInstance();

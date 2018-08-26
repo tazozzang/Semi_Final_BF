@@ -24,19 +24,20 @@
         android:text="메모추가"
         android:textSize="20sp"
         android:padding="15sp"/>
-
     <fragment
         android:id="@+id/place_search"
         android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
         android:layout_width="match_parent"
-        android:layout_height="50dp"/>
+        android:layout_height="50dp"
+        />
 
     <fragment
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:name="com.google.android.gms.maps.MapFragment"
-        />
+        android:name="com.google.android.gms.maps.MapFragment" />
+
+
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

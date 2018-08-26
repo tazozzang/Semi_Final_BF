@@ -19,7 +19,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -30,10 +29,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.Wearable;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Locale;
 
 public class MainActivity extends Activity implements TextToSpeech.OnInitListener, GoogleApiClient.ConnectionCallbacks,
@@ -738,6 +734,7 @@ GoogleApiClient.OnConnectionFailedListener{
                         Toast.makeText(context, "Make Alarm", Toast.LENGTH_SHORT).show();
                         tts.speak(makeAlarm, TextToSpeech.QUEUE_ADD, null);
                         Intent intent = new Intent(context, MakeAlarm.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                         startActivity(intent);
                     }
                 }
