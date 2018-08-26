@@ -10,79 +10,33 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
     android:gravity="center"
+    android:background="#00FFFFFF"
     tools:context="com.example.tazo.semi_final_bf.MakeAlarm"
     >
 
-    <TimePicker
-        android:id="@+id/timePicker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:timePickerMode="spinner"
-        android:clickable="false"/>
 
-    <LinearLayout
-        android:gravity="center"
-        android:orientation="horizontal"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <Button
-            android:text="모르는문자"
-            android:id="@+id/viba"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="showvib"/>
-        <Button
-            android:text="모르는전화"
-            android:id="@+id/vibb"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="showvib"/>
-        <Button
-            android:text="모르는둘다"
-            android:id="@+id/vibc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="showvib"/>
+        android:layout_height="match_parent">
 
-    </LinearLayout>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/controller"
+            />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center">
 
-    <LinearLayout
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <Button
-            android:text="아는문자"
-            android:id="@+id/vibe"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="showvib"/>
-        <Button
-            android:text="아는전화"
-            android:id="@+id/vibf"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="showvib"/>
-        <Button
-            android:text="아는둘다"
-            android:id="@+id/vibg"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="showvib"/>
-
-    </LinearLayout>
-    <Button
-        android:text="알람"
-        android:id="@+id/vibd"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="showvib"/>
-    <Button
-        android:text="CANCEL"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/cancelvib"
-        android:onClick="showvib"/>
+            <TimePicker
+                android:id="@+id/timePicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:timePickerMode="spinner"
+                android:clickable="false"/>
+        </LinearLayout>
+    </FrameLayout>
 
 
 </LinearLayout>

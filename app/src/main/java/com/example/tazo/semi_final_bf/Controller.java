@@ -57,7 +57,7 @@ public class Controller {
                 e.printStackTrace();
             }
         }
-    };
+    }; // 이 Handler는 아이콘의 이름을 빠르게 출력하기 위해서 추가했습니다.
 
     public Controller() {}
 
