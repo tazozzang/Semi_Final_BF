@@ -37,6 +37,10 @@ public class Place_Adapter extends ArrayAdapter<Place_Info> {
             if(p_n != null){
                 p_n.setText(place_info.getPlace_name());
             }
+            TextView p_t = (TextView)v.findViewById(R.id.place_type);
+            if(p_t != null){
+                p_t.setText(place_info.getPlace_type().toString());
+            }
         }
 
         return v;

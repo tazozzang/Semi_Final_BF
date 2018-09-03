@@ -97,7 +97,8 @@ public class Choose_Place extends AppCompatActivity  implements com.google.andro
             @Override
             public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
                 for (PlaceLikelihood placeLikelihood : likelyPlaces) {
-                    Place_Info place_info = new Place_Info( placeLikelihood.getPlace().getName(),placeLikelihood.getPlace().getLatLng());
+                    Place_Info place_info = new Place_Info( placeLikelihood.getPlace().getName(),placeLikelihood.getPlace().getLatLng(), placeLikelihood.getPlace().getPlaceTypes());
+
                     place_name.add(place_info);
                 }
                 likelyPlaces.release();

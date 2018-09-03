@@ -45,7 +45,7 @@
         </activity>
         <activity android:name=".CSettingActivity" />
         <activity android:name=".CSettingApplication" />
-        <activity android:name=".MakeAlarm" />
+        <activity android:name=".MakeAlarm"/>
 
         <receiver android:name=".BroadcastD" />
 
