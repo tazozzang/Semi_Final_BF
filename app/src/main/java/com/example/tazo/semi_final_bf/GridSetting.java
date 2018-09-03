@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -75,6 +76,12 @@ public class GridSetting {
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }
+        }
+
+        for(int j = gridLimit; j < 9; j++) { // 아이콘이 없으면 null로 초기화
+            ImageView iv = (ImageView)viewList.get(j);
+            iv.setImageDrawable(null);
+            applist.add(null);
         }
     }
 

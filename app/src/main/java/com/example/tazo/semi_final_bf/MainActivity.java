@@ -598,8 +598,10 @@ GoogleApiClient.OnConnectionFailedListener{
                                 }else {
                                     // 아이콘 포커스
                                     int iconSelected = calculate_grid(sx,sy);
-                                    focusedName = gridSetting.getGridIconName(gridIndex + iconSelected - 1);
-                                    focusedPName = gridSetting.getGridIconPName(gridIndex + iconSelected - 1);
+                                    if(gridIndex + iconSelected -1 < gridSetting.getLimit(context)) {
+                                        focusedName = gridSetting.getGridIconName(gridIndex + iconSelected - 1);
+                                        focusedPName = gridSetting.getGridIconPName(gridIndex + iconSelected - 1);
+                                    }
                                 }
                             }
                         }, 200);
