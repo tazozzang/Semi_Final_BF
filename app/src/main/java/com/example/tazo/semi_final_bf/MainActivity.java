@@ -608,7 +608,7 @@ GoogleApiClient.OnConnectionFailedListener{
                 if(view_mode == 4) {
                     if (e.getPointerCount() == 1) {
                         controllers[currentController].actionDown(e);
-                        //[자동 롤링] 타이머 시~작
+                        //[자동 롤링] 타이머 시작
                     }
                 }
                 break;
