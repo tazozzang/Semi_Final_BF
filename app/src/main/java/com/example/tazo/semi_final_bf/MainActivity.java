@@ -211,15 +211,9 @@ GoogleApiClient.OnConnectionFailedListener{
             GridList.add(findViewById(R.id.threethree));
 
             gridSetting.setGrid(this, gridIndex, GridList);
-//            ImageView iv = (ImageView)findViewById(R.id.oneone);
-//            iv.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    view_mode = 4;
-//                    setContentView(R.layout.activity_main);
-//                    // 잠시 모드를 바꿀 수 있는 용도로 쓸 것임
-//                }
-//            });
+            focusedNum = 0;
+            focusedName = gridSetting.getGridIconName(gridIndex + focusedNum, focusedNum,true);
+            focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum);
 
         }else {
             // DB에 저장된 view mode가 없음
@@ -588,11 +582,11 @@ GoogleApiClient.OnConnectionFailedListener{
         }
         int number = count%appNum;
         if(focusedNum != number) {
-            //포커스을 바꿔줌
+            //포커스를 바꿔줌
             focusedNum = number;
             Log.d("test","Focused num - auto: "+focusedNum);
             //Toast.makeText(getApplicationContext(),"Focused num: "+focusedNum,Toast.LENGTH_SHORT).show();
-            focusedName = gridSetting.getGridIconName(gridIndex + focusedNum);
+            focusedName = gridSetting.getGridIconName(gridIndex + focusedNum, focusedNum, true);
             focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum);
         }
     }
@@ -601,7 +595,7 @@ GoogleApiClient.OnConnectionFailedListener{
 
         switch (e.getActionMasked() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                        timeCounter.sendEmptyMessage(TIMER_START);
+                timeCounter.sendEmptyMessage(TIMER_START);
                 sx = e.getX();
                 sy = e.getY();
                 swipe_mode = none;
@@ -633,7 +627,7 @@ GoogleApiClient.OnConnectionFailedListener{
                                 }else {
                                     // 아이콘 포커스
                                     focusedNum = calculate_grid(sx,sy) - 1;
-                                    focusedName = gridSetting.getGridIconName(gridIndex + focusedNum);
+                                    focusedName = gridSetting.getGridIconName(gridIndex + focusedNum, focusedNum,true);
                                     focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum);
                                     Log.d("test","Focused num"+focusedNum);
                                     // [자동 롤링] 현재 포커스 숫자를 바꿈.
@@ -717,6 +711,9 @@ GoogleApiClient.OnConnectionFailedListener{
                             if(gridIndex +9 < gridSetting.getLimit(context)) {
                                 gridIndex = gridIndex +9;
                                 gridSetting.setGrid(this, gridIndex, GridList);
+                                focusedNum = 0;
+                                focusedName = gridSetting.getGridIconName(gridIndex + focusedNum, focusedNum, true);
+                                focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum);
                                 v.vibrate(cpattern3, -1);
                             }else {
                                 Toast.makeText(this, "마지막 페이지입니다.",Toast.LENGTH_SHORT).show();
@@ -754,6 +751,9 @@ GoogleApiClient.OnConnectionFailedListener{
                             if(gridIndex - 9 >= 0) {
                                 gridIndex = gridIndex - 9;
                                 gridSetting.setGrid(this, gridIndex, GridList);
+                                focusedNum = 0;
+                                focusedName = gridSetting.getGridIconName(gridIndex + focusedNum, focusedNum, true);
+                                focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum);
                                 v.vibrate(cpattern3, -1);
                             }else {
                                 Toast.makeText(this, "첫번째 페이지입니다.",Toast.LENGTH_SHORT).show();

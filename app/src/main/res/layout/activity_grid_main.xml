@@ -17,40 +17,49 @@
 
         <ImageView
             android:id="@+id/oneone"
+            android:padding="5dp"
             android:layout_columnWeight="1"
             android:layout_rowWeight="1"/>
         <ImageView
             android:id="@+id/onetwo"
+            android:padding="5dp"
             android:layout_columnWeight="1"
             android:layout_rowWeight="1"/>
         <ImageView
             android:id="@+id/onethree"
+            android:padding="5dp"
             android:layout_columnWeight="1"
             android:layout_rowWeight="1"/>
 
         <ImageView
             android:id="@+id/twoone"
+            android:padding="5dp"
             android:layout_columnWeight="1"
             android:layout_rowWeight="1"/>
         <ImageView
             android:id="@+id/twotwo"
+            android:padding="5dp"
             android:layout_columnWeight="1"
             android:layout_rowWeight="1"/>
         <ImageView
             android:id="@+id/twothree"
+            android:padding="5dp"
             android:layout_columnWeight="1"
             android:layout_rowWeight="1"/>
 
         <ImageView
             android:id="@+id/threeone"
+            android:padding="5dp"
             android:layout_columnWeight="1"
             android:layout_rowWeight="1"/>
         <ImageView
             android:id="@+id/threetwo"
+            android:padding="5dp"
             android:layout_columnWeight="1"
             android:layout_rowWeight="1"/>
         <ImageView
             android:id="@+id/threethree"
+            android:padding="5dp"
             android:layout_columnWeight="1"
             android:layout_rowWeight="1"/>
     </GridLayout>
