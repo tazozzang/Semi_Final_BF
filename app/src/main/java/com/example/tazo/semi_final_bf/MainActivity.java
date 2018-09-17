@@ -638,7 +638,7 @@ GoogleApiClient.OnConnectionFailedListener{
 
                     }else if (clickCount == 2) {
                         long duration = System.currentTimeMillis() - startTime;
-                        if (duration <= 1000) {
+                        if (duration <= 1000) { // ** 값 조정 필요
                             if(view_mode == 4) {
                                 // Double Tap
                                 if (controllerNum < 3) {
@@ -667,6 +667,12 @@ GoogleApiClient.OnConnectionFailedListener{
                         } else {
                             startTime = System.currentTimeMillis();
                             clickCount = 1;
+                            if(view_mode == 5) {
+                                clickCount = 0; // ** 인자 초기화 의미 불명확함
+                                focusedNum = calculate_grid(sx,sy) - 1;
+                                focusedName = gridSetting.getGridIconName(gridIndex + focusedNum, focusedNum,true);
+                                focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum);
+                            }
                         }
                     }
                 }
