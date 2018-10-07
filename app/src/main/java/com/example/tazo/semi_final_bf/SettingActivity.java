@@ -1,25 +1,20 @@
 package com.example.tazo.semi_final_bf;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Vibrator;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.support.annotation.Nullable;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Set;
 
 import in.championswimmer.sfg.lib.SimpleFingerGestures;
 
@@ -76,6 +71,7 @@ public class SettingActivity extends Activity implements TextToSpeech.OnInitList
         adapter.add("설정 취소");
         adapter.add("모드 변경");
         adapter.add("컨트롤러 설정");
+        adapter.add("화면 안내");
         listView.setAdapter(adapter);
 
         tts = new TextToSpeech(this, this);
@@ -102,11 +98,18 @@ public class SettingActivity extends Activity implements TextToSpeech.OnInitList
                     case 1:
                         // 모드 변경
                         startActivityForResult(new Intent(SettingActivity.this, MSettingActivity.class), 4);
+                        finish();
                         break;
                     case 2:
                         // 컨트롤러 설정
                         Intent c = new Intent(SettingActivity.this, CSettingActivity.class);
                         startActivityForResult(c,2);
+                        finish();
+                        break;
+                    case 3:
+                        // 모드 변경
+                        startActivity(new Intent(SettingActivity.this, NaviActivity.class));
+                        finish();
                         break;
                 }
             }

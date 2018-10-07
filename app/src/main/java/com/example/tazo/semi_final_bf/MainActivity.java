@@ -5,14 +5,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Vibrator;
-import android.provider.CallLog;
-import android.provider.Telephony;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -105,72 +101,6 @@ GoogleApiClient.OnConnectionFailedListener{
     long startTime;
 
 
-    final long[] Know_You = {
-            500, 800
-    };
-    final long[] Dont_Know_You = {
-            500, 200, 200, 200, 200, 200, 200
-    };
-    int count = 0;
-
-
-    final long[] pattern_ms = {
-            50,70,100,150,500,70,100,150,500
-    };
-    final long[] pattern_cll = {
-            0, 200
-    };
-    final long[] pattern_mscl = {
-            0, 800
-    };
-
-
-
-    int CALL_SMS = 0; // 0 둘 다 없음, 1 전화만 , 2 문자만 , 3 전화, 문자
-
-    String ADDR_CALL = "모르는 번호";
-    boolean ckKnow = false; // 아는지 모르는지 체크
-
-    public final String Scron = "android.intent.action.SCREEN_ON";
-    public final String Scroff = "android.intent.action.SCREEN_OFF";
-    Cursor cursor;
-
-
-    private Cursor getSmsLog(){
-
-        String columns[] = new String[]{
-                Telephony.Sms._ID, // 행의 고유 ID
-                Telephony.Sms.THREAD_ID, // 스레드 ID
-                Telephony.Sms.ADDRESS, // 번호
-                Telephony.Sms.PERSON, // 보낸 사람 ID
-                Telephony.Sms.BODY, // 본문
-                Telephony.Sms.SUBJECT, // 제목
-                //Telephony.Sms.SUBSCRIPTION_ID, // 속한 구독
-                Telephony.Sms.READ // 읽었니
-
-        };
-        Cursor c = getContentResolver().query(Uri.parse("content://sms"), columns, null, null,"date DESC");
-        return c;
-    }
-
-    private Cursor getCallLog(){
-
-        String columns[]=new String[] {
-                CallLog.Calls._ID, // 고유 ID 넘버
-                CallLog.Calls.CACHED_NAME, // 저장명
-                CallLog.Calls.NUMBER, // 폰번
-                CallLog.Calls.DATE, // 날짜
-                CallLog.Calls.DURATION,
-                CallLog.Calls.TYPE, // 수신/발신/부재중
-                CallLog.Calls.IS_READ
-                // 안 읽은 것은 0 읽은 것은 1
-        };
-        Cursor c = getContentResolver().query(Uri.parse("content://call_log/calls"),
-                columns, null, null, "Calls._ID DESC");
-
-        return c;
-    }
-
 
     @Override
     protected void onStart() {
@@ -261,85 +191,11 @@ GoogleApiClient.OnConnectionFailedListener{
 
         pm = context.getPackageManager();
 
-//        ScreenOn screenOn = new ScreenOn();
-//        IntentFilter filter = new IntentFilter();
-//        filter.addAction(Scron);
-//        filter.addAction(Scroff);
-//        registerReceiver(screenOn,filter);
-//        if(CalLogPerCheck != PackageManager.PERMISSION_DENIED &&
-//                SmsLogPerCheck != PackageManager.PERMISSION_DENIED){
-//            CALL_SMS = readLOG();
-//        } 진동 패턴 때문에 설정해놓은 코드
 
         appImage = (ImageView)findViewById(R.id.app_image);
 
     }
-//    public int readLOG(){  부재중 전화, 문자에 따른 진동 패턴 주는 코드
-//        cursor = getCallLog();
-//        if(cursor != null){
-//            cursor.moveToNext();
-//            cursor.getColumnIndex(CallLog.Calls.DATE);
-//            //aaa.setText(cursor.getString(0) + ", " + cursor.getString(1));
-//            //cursor.getString(1)이 null 일 때 다른 진동 주기 / 또는 반대
-//           // bbb.setText(cursor.getString(2) + ", " + cursor.getString(5) + ", " + cursor.getString(6));
-//            // getString(5)가 3일때 부재중인가
-//
-//            if(cursor.getString(5).equals("3") && cursor.getString(6).equals("0")){
-//                //Toast.makeText(this,"안읽은부재중전화있음", Toast.LENGTH_LONG).show();
-//                CALL_SMS += 1;
-//                //ADDR_CALL = cursor.getString(1);
-//            }
-//
-//
-//            if(cursor.getString(1) != null){
-//                ADDR_CALL = cursor.getString(1);
-//                ckKnow = true;
-//            }else{
-//                ADDR_CALL = "모르는 번호";
-//                ckKnow = false;
-//            }
-//
-//            // 퍼미션 안녕
-//        }else {
-//           // aaa.setText("NANANA");
-//        }
-//
-//        cursor = getSmsLog();
-//        if(cursor != null){
-//            cursor.moveToFirst();
-////            ccc.setText(cursor.getString(2)+", "+ cursor.getString(3));
-////            //cursor.getString(3)이 null 일 때 다른 진동 주기 / 또는 반대
-////            ddd.setText(cursor.getString(4)+", "+ cursor.getString(7));
-//            if(cursor.getString(6).equals("0")){
-//                CALL_SMS += 2;
-//            }
-//
-//            if(cursor.getString(3) != null) { // 아는 사람
-//                ckKnow = true;
-//            }else{
-//                ckKnow = false;
-//            }
-//
-//
-//
-//        }else {
-//            //ccc.setText("NANANA");
-//        }
-//        if(CALL_SMS == 1){
-//            new NoticeCall(getApplicationContext()).NC(ADDR_CALL,ckKnow);
-//        }
-//        else if(CALL_SMS == 2){
-//            new NoticeSms(getApplicationContext()).NS(ckKnow);
-//        }
-//        else if(CALL_SMS == 3){
-//            new NoticeBoth(getApplicationContext()).NB(ADDR_CALL,ckKnow);
-//        }
-//        return 0;
-//    }
 
-
-    //////////////////////////////////////////////////////////////////
-    //// 데이터 통신용
 
 
     @Override
@@ -367,127 +223,6 @@ GoogleApiClient.OnConnectionFailedListener{
         }
     };
 
-//    public void onDontVibrate(){ 진동 우우웅 함수
-//        PutDataMapRequest dataMapRequest = PutDataMapRequest.create("/DONT_VIBE_PATH");
-//        dataMapRequest.getDataMap().putLongArray("dontknow",Dont_Know_You);
-//
-//        dataMapRequest.getDataMap().putInt("count",count++);
-//        PutDataRequest request = dataMapRequest.asPutDataRequest();
-//
-//        Wearable.DataApi.putDataItem(googleApiClient,request).setResultCallback(resultCallback);
-//        //Toast.makeText(getApplicationContext(),"No보내숑",Toast.LENGTH_SHORT).show();
-//    }
-//
-//    public void onKnowVibrate(){
-//        PutDataMapRequest dataMapRequest = PutDataMapRequest.create("/KNOW_VIBE_PATH");
-//        dataMapRequest.getDataMap().putLongArray("know",Know_You);
-//
-//        dataMapRequest.getDataMap().putInt("count",count++);
-//        PutDataRequest request = dataMapRequest.asPutDataRequest();
-//
-//        Wearable.DataApi.putDataItem(googleApiClient,request).setResultCallback(resultCallback);
-//        //Toast.makeText(getApplicationContext(),"YES보내숑",Toast.LENGTH_SHORT).show();
-//    }
-
-
-    /////////////////////////////////////////////////////////////////
-
-//    public class NoticeCall{ 진동 주는 클래스
-//        public Context context;
-//        public NoticeCall(Context context){this.context = context;}
-//        public void NC(String name , boolean check){
-//
-//            if(check){
-//                onKnowVibrate();
-//            }else{
-//                onDontVibrate();
-//            }
-//            Intent calintent = new Intent(Intent.ACTION_VIEW, CallLog.Calls.CONTENT_URI);
-//
-//            PendingIntent sender =
-//                    PendingIntent.getActivity(context,1,calintent,PendingIntent.FLAG_UPDATE_CURRENT);
-//
-//
-//            NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-//
-//            Notification.Builder builder = new Notification.Builder(context);
-//            builder.setSmallIcon(R.drawable.min);
-//            builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),R.drawable.max));
-//
-//            builder.setTicker("전화");
-//            builder.setContentTitle(name + " 전화 왔다");
-//            builder.setContentText("읽어라");
-//            builder.setVibrate(pattern_cll);
-//            builder.setAutoCancel(true);
-//            builder.setContentIntent(sender);
-//
-//            Notification notification = builder.build();
-//            notificationManager.notify(1,notification);
-//        }
-//    }
-//    public class NoticeSms{
-//        public Context context;
-//        public NoticeSms(Context context){this.context = context;}
-//        public void NS( boolean check){
-//
-//            if(check){
-//                onKnowVibrate();
-//            }else{
-//                onDontVibrate();
-//            }
-//
-//            NotificationManager notificationManager =
-//                    (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-//
-//            String myphone = Settings.Secure.getString(getContentResolver(), "sms_default_application");
-//            PackageManager packageManager = context.getPackageManager();
-//            Intent smsintent = packageManager.getLaunchIntentForPackage(myphone);
-//
-//            PendingIntent sender =
-//                    PendingIntent.getActivity(context,1,smsintent,PendingIntent.FLAG_UPDATE_CURRENT);
-//
-//            Notification.Builder builder = new Notification.Builder(context);
-//            builder.setSmallIcon(R.drawable.min);
-//            builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),R.drawable.max));
-//
-//            builder.setTicker("문자");
-//            builder.setContentTitle("문자 왔다");
-//            builder.setContentText("읽어라");
-//            builder.setVibrate(pattern_ms);
-//            builder.setAutoCancel(true);
-//            builder.setContentIntent(sender);
-//
-//            Notification notification = builder.build();
-//            notificationManager.notify(1,notification);
-//
-//        }
-//    }
-//
-//    public class NoticeBoth{
-//        public Context context;
-//        public NoticeBoth(Context context){this.context = context;}
-//        public void NB(String name , boolean check){
-//
-//            if(check){
-//                onKnowVibrate();
-//            }else{
-//                onDontVibrate();
-//            }
-//
-//            NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-//
-//            Notification.Builder builder = new Notification.Builder(context);
-//            builder.setSmallIcon(R.drawable.min);
-//            builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),R.drawable.max));
-//
-//            builder.setTicker("문자 전화");
-//            builder.setContentTitle(name + " 전화, 문자 왔다");
-//            builder.setContentText("읽어라");
-//            builder.setVibrate(pattern_mscl);
-//            Notification notification = builder.build();
-//            notificationManager.notify(1,notification);
-//        }
-//    }
     void perCheck(){
         ActivityCompat.requestPermissions(this,
                 new String[]{
@@ -775,6 +510,7 @@ GoogleApiClient.OnConnectionFailedListener{
                         tts.speak(settinmsg, TextToSpeech.QUEUE_FLUSH, null);
                         Intent intent = new Intent(context, SettingActivity.class);
                         startActivityForResult(intent, REQUEST_CHANGE);
+                        finish();
                     }
                     // up to down swipe
                     else if (stopY - startY > SWIPE_MIN_DISTANCE && Math.abs(stopY - startY) > SWIPE_THRESHOLD_VELOCITY) {
@@ -910,18 +646,6 @@ GoogleApiClient.OnConnectionFailedListener{
         return 0;
     }
 
-//    public class ScreenOn extends BroadcastReceiver {
-//
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            if (intent.getAction().equals(Scron)) {
-//                CALL_SMS = readLOG();
-//            }
-//            else if(intent.getAction().equals(Scroff)){
-//
-//            }
-//        }
-//    } // 잠금화면에서 읽는 듯한 코드
 
     //[자동 롤링]에 쓰는 타이머 클래스.
     class TimeCounter extends Handler {

@@ -43,9 +43,14 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+
+        <activity android:name=".NaviActivity">
+        </activity>
+
         <activity android:name=".CSettingActivity" />
         <activity android:name=".CSettingApplication" />
-        <activity android:name=".MakeAlarm"/>
+        <activity android:name=".MakeAlarm" />
 
         <receiver android:name=".BroadcastD" />
 
@@ -58,7 +63,8 @@
         <activity android:name=".MSettingActivity" />
         <activity android:name=".MyMemoActivity" />
         <activity android:name=".ReadMemoActivity" />
-        <activity android:name=".ChooseCategoryActivity"></activity>
+        <activity android:name=".ChooseCategoryActivity" />
+
     </application>
 
 </manifest>
