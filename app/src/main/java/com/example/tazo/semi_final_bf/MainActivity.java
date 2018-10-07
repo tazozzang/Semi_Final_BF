@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -100,7 +101,8 @@ GoogleApiClient.OnConnectionFailedListener{
 
     long startTime;
 
-
+    SharedPreferences preferences;
+    SharedPreferences.Editor editor;
 
     @Override
     protected void onStart() {
@@ -119,6 +121,21 @@ GoogleApiClient.OnConnectionFailedListener{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        preferences = getSharedPreferences("activity_main", Activity.MODE_PRIVATE);
+
+        editor = preferences.edit();
+
+        boolean checkNavi = preferences.getBoolean("init",false);
+        if(!checkNavi){
+            Intent naviIntent = new Intent(getApplicationContext(), NaviActivity.class);
+            startActivity(naviIntent);
+            editor.clear();
+            editor.putBoolean("init", true);
+            editor.commit();
+        }
+
+
         db_handler = DB_Handler.open(this);
         view_mode = db_handler.getMode();
 
@@ -510,7 +527,7 @@ GoogleApiClient.OnConnectionFailedListener{
                         tts.speak(settinmsg, TextToSpeech.QUEUE_FLUSH, null);
                         Intent intent = new Intent(context, SettingActivity.class);
                         startActivityForResult(intent, REQUEST_CHANGE);
-                        finish();
+                        //finish();
                     }
                     // up to down swipe
                     else if (stopY - startY > SWIPE_MIN_DISTANCE && Math.abs(stopY - startY) > SWIPE_THRESHOLD_VELOCITY) {

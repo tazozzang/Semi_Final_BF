@@ -98,16 +98,14 @@ public class SettingActivity extends Activity implements TextToSpeech.OnInitList
                     case 1:
                         // 모드 변경
                         startActivityForResult(new Intent(SettingActivity.this, MSettingActivity.class), 4);
-                        finish();
                         break;
                     case 2:
                         // 컨트롤러 설정
                         Intent c = new Intent(SettingActivity.this, CSettingActivity.class);
                         startActivityForResult(c,2);
-                        finish();
                         break;
                     case 3:
-                        // 모드 변경
+                        // 화면 안내
                         startActivity(new Intent(SettingActivity.this, NaviActivity.class));
                         finish();
                         break;
@@ -157,10 +155,13 @@ public class SettingActivity extends Activity implements TextToSpeech.OnInitList
                 } else if (keyPosition == 1) {
                     // 1 : 모드 변경
                     startActivityForResult(new Intent(SettingActivity.this, MSettingActivity.class), 4);
-                } else {
+                } else if(keyPosition == 2){
                     // 2 : 컨트롤러 설정
                     Intent c = new Intent(SettingActivity.this, CSettingActivity.class);
                     startActivityForResult(c,2);
+                }   else{
+                    startActivity(new Intent(SettingActivity.this, NaviActivity.class));
+                    finish();
                 }
                 return false;
             }
