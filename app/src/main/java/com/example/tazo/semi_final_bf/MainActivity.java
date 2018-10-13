@@ -160,7 +160,7 @@ GoogleApiClient.OnConnectionFailedListener{
             gridSetting.setGrid(this, gridIndex, GridList);
             focusedNum = 0;
             focusedName = gridSetting.getGridIconName(gridIndex + focusedNum, focusedNum,true);
-            focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum);
+            focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum, gridIndex);
 
         }else {
             // DB에 저장된 view mode가 없음
@@ -339,7 +339,7 @@ GoogleApiClient.OnConnectionFailedListener{
             Log.d("test","Focused num - auto: "+focusedNum);
             //Toast.makeText(getApplicationContext(),"Focused num: "+focusedNum,Toast.LENGTH_SHORT).show();
             focusedName = gridSetting.getGridIconName(gridIndex + focusedNum, focusedNum, true);
-            focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum);
+            focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum, gridIndex);
         }
     }
 
@@ -380,7 +380,7 @@ GoogleApiClient.OnConnectionFailedListener{
                                     // 아이콘 포커스
                                     focusedNum = calculate_grid(sx,sy) - 1;
                                     focusedName = gridSetting.getGridIconName(gridIndex + focusedNum, focusedNum,true);
-                                    focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum);
+                                    focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum, gridIndex);
                                     Log.d("test","Focused num"+focusedNum);
                                     // [자동 롤링] 현재 포커스 숫자를 바꿈.
                                     timeCounter.changeFocusedNum(focusedNum-1);
@@ -413,6 +413,9 @@ GoogleApiClient.OnConnectionFailedListener{
                                 // 포커스 된 아이콘 실행
                                 timeCounter.sendEmptyMessage(TIMER_STOP);
                                 Intent fi = pm.getLaunchIntentForPackage(focusedPName);
+                                if(focusedPName == "스팟메모") {
+                                    fi = new Intent(this, SM_main.class);
+                                }
                                 startActivity(fi);
                             }
                             clickCount = 0;
@@ -423,7 +426,7 @@ GoogleApiClient.OnConnectionFailedListener{
                                 clickCount = 0; // ** 인자 초기화 의미 불명확함
                                 focusedNum = calculate_grid(sx,sy) - 1;
                                 focusedName = gridSetting.getGridIconName(gridIndex + focusedNum, focusedNum,true);
-                                focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum);
+                                focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum, gridIndex);
                             }
                         }
                     }
@@ -467,11 +470,15 @@ GoogleApiClient.OnConnectionFailedListener{
                         }
                         if(view_mode == 5) {
                             if(gridIndex +9 < gridSetting.getLimit(context)) {
-                                gridIndex = gridIndex +9;
+                                if(gridIndex == 0) {
+                                    gridIndex = gridIndex + 8;
+                                }else {
+                                    gridIndex = gridIndex + 9;
+                                }
                                 gridSetting.setGrid(this, gridIndex, GridList);
                                 focusedNum = 0;
                                 focusedName = gridSetting.getGridIconName(gridIndex + focusedNum, focusedNum, true);
-                                focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum);
+                                focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum, gridIndex);
                                 v.vibrate(cpattern3, -1);
                             }else {
                                 Toast.makeText(this, "마지막 페이지입니다.",Toast.LENGTH_SHORT).show();
@@ -506,12 +513,16 @@ GoogleApiClient.OnConnectionFailedListener{
                             }
                         }
                         if(view_mode == 5) {
-                            if(gridIndex - 9 >= 0) {
-                                gridIndex = gridIndex - 9;
+                            if(gridIndex - 8 >= 0) {
+                                if(gridIndex == 8) {
+                                    gridIndex = 0;
+                                }else {
+                                    gridIndex = gridIndex - 9;
+                                }
                                 gridSetting.setGrid(this, gridIndex, GridList);
                                 focusedNum = 0;
                                 focusedName = gridSetting.getGridIconName(gridIndex + focusedNum, focusedNum, true);
-                                focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum);
+                                focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum, gridIndex);
                                 v.vibrate(cpattern3, -1);
                             }else {
                                 Toast.makeText(this, "첫번째 페이지입니다.",Toast.LENGTH_SHORT).show();
