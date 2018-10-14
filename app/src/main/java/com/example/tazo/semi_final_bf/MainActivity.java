@@ -352,6 +352,7 @@ GoogleApiClient.OnConnectionFailedListener{
             //Toast.makeText(getApplicationContext(),"Focused num: "+focusedNum,Toast.LENGTH_SHORT).show();
             focusedName = gridSetting.getGridIconName(gridIndex + focusedNum, focusedNum, true);
             focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum, gridIndex);
+            tts.speak(focusedName,TextToSpeech.QUEUE_FLUSH,null);
         }
     }
 
@@ -360,21 +361,25 @@ GoogleApiClient.OnConnectionFailedListener{
         switch (e.getActionMasked() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 Log.d("touch","ACTION_DOWN");
-                timeCounter.sendEmptyMessage(TIMER_START);
                 sx = e.getX();
                 sy = e.getY();
                 swipe_mode = none;
                 if(view_mode == 4) {
                     if (e.getPointerCount() == 1) {
                         controllers[currentController].actionDown(e);
-                        //[자동 롤링] 타이머 시작
                     }
+                }
+                else if(view_mode == 5){
+                    //[자동 롤링] 타이머 시작
+                    timeCounter.sendEmptyMessage(TIMER_START);
                 }
                 break;
             case MotionEvent.ACTION_UP:
                 Log.d("touch","ACTION_UP");
-                //[자동 롤링] 롱프레스 타이머 끝.
-                timeCounter.sendEmptyMessage(TIMER_STOP);
+                if(view_mode == 5) {
+                    //[자동 롤링] 롱프레스 타이머 끝.
+                    timeCounter.sendEmptyMessage(TIMER_STOP);
+                }
                 int FingerNum = e.getPointerCount();
                 // left to right
                 if(isThereTSwipe) {
@@ -460,13 +465,15 @@ GoogleApiClient.OnConnectionFailedListener{
                                     } else {
                                         // 아이콘 포커스
                                         if(!isThereSSwipe) {
-                                            focusedNum = calculate_grid(sx, sy) - 1;
-                                            focusedName = gridSetting.getGridIconName(gridIndex + focusedNum, focusedNum, true);
-                                            focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum, gridIndex);
-                                            tts.speak(focusedName, TextToSpeech.QUEUE_ADD, null);
-                                            Log.d("test", "Focused num" + focusedNum);
-                                            // [자동 롤링] 현재 포커스 숫자를 바꿈.
-                                            timeCounter.changeFocusedNum(focusedNum - 1);
+                                            if(!timeCounter.isLongPressed()) { // 롱프레스 터치가 아니면.
+                                                focusedNum = calculate_grid(sx, sy) - 1;
+                                                focusedName = gridSetting.getGridIconName(gridIndex + focusedNum, focusedNum, true);
+                                                focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum, gridIndex);
+                                                tts.speak(focusedName, TextToSpeech.QUEUE_ADD, null);
+                                                Log.d("test", "Focused num" + focusedNum);
+                                                // [자동 롤링] 현재 포커스 숫자를 바꿈.
+                                                timeCounter.changeFocusedNum(focusedNum - 1);
+                                            }
                                         }else {
                                             isThereSSwipe = false;
                                         }
@@ -514,9 +521,11 @@ GoogleApiClient.OnConnectionFailedListener{
                                 clickCount = 1;
                                 if (view_mode == 5) {
                                     clickCount = 0; // ** 인자 초기화 의미 불명확함
-                                    focusedNum = calculate_grid(sx, sy) - 1;
-                                    focusedName = gridSetting.getGridIconName(gridIndex + focusedNum, focusedNum, true);
-                                    focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum, gridIndex);
+                                    if(!timeCounter.isLongPressed()) {//롱 프레스 터치가 아니였으면.
+                                        focusedNum = calculate_grid(sx, sy) - 1;
+                                        focusedName = gridSetting.getGridIconName(gridIndex + focusedNum, focusedNum, true);
+                                        focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum, gridIndex);
+                                    }
                                 }
                             }
                         }
@@ -644,7 +653,9 @@ GoogleApiClient.OnConnectionFailedListener{
                         Toast.makeText(context, settinmsg, Toast.LENGTH_SHORT).show();
                         tts.speak(settinmsg, TextToSpeech.QUEUE_FLUSH, null);
                         // 중앙에 위치한 앱 아이콘 삭제 효과
-                        appImage.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
+                        if(appImage != null) {
+                            appImage.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
+                        }
                         Intent intent = new Intent(context, SettingActivity.class);
                         startActivityForResult(intent, REQUEST_CHANGE);
                         //finish();
@@ -791,35 +802,56 @@ GoogleApiClient.OnConnectionFailedListener{
     //[자동 롤링]에 쓰는 타이머 클래스.
     class TimeCounter extends Handler {
         int count_;
+        int timerStatus_ = -1; // -1: 리셋, 0: 스톱, 1: 실행중
+        int timeCount_ = 0;
 
-        TimeCounter(int count){
+        TimeCounter(int count) {
             count_ = count;
         }
 
-        TimeCounter(){
+        TimeCounter() {
             count_ = 0;
         }
 
-        public void changeFocusedNum(int num){
+        public void changeFocusedNum(int num) {
             count_ = num;
         }
+
+        public void resetTimerStatus() {
+            timeCount_ = 0;
+        }
+
+        //롱프레스가 막 끝났거나 하는중이면 true. false이면 롱프레스 아님.
+        public boolean isLongPressed() {
+            Log.d("is long pressed", Integer.toString(timerStatus_));
+            if (timeCount_ > 0 ){
+                return true;
+            }
+            return false;
+        }
+
         @Override
         public void handleMessage(Message msg) {
-            switch (msg.what){
+            switch (msg.what) {
                 case TIMER_START:
+                    timerStatus_ = 1;
+                    timeCount_ = 0;
                     this.removeMessages(TIMER_REPEAT);
                     Log.d("timerhandler", "timer start!");
-                    this.sendEmptyMessageDelayed(TIMER_REPEAT,TIME_DElAY);
+                    this.sendEmptyMessageDelayed(TIMER_REPEAT, TIME_DElAY);
                     break;
                 case TIMER_REPEAT:
+                    timerStatus_ = 1;
                     count_++;
+                    timeCount_++;
                     //temp
-                    Log.d("timehandler","Time count: "+count_);
+                    Log.d("timehandler", "Time count: " + count_);
                     onTimeWork(count_);
-                    this.sendEmptyMessageDelayed(TIMER_REPEAT,TIME_DElAY);
+                    this.sendEmptyMessageDelayed(TIMER_REPEAT, TIME_DElAY);
                     break;
                 case TIMER_STOP:
-                    Log.d("timehandler","timer stop!!!");
+                    Log.d("timehandler", "timer stop!!!");
+                    timerStatus_ = 0;
                     this.removeMessages(TIMER_REPEAT);
                     break;
             }
