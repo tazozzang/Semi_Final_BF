@@ -51,10 +51,10 @@ GoogleApiClient.OnConnectionFailedListener{
     double theta; // startPoint와 currentPoint 벡터의 사이각
     double ztheta; // theta 계산시 사용
 
-    // 컨트롤러 모드(4), 바둑판 모드(5)
+    // 컨트롤러 모드(4), 격자 무늬 모드(5)
     int view_mode = 4;
 
-    // 바둑판 배열
+    // 격자 무늬
     GridSetting gridSetting;
     int gridIndex = 0;
     List<View> GridList;

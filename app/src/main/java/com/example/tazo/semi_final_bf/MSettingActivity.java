@@ -153,7 +153,7 @@ public class MSettingActivity extends Activity implements TextToSpeech.OnInitLis
                     setResult(4, returnIntent);
                     finish();
                 } else if (keyPosition == 2) {
-                    // 1 : 바둑판 모드
+                    // 1 : 격자 무늬 모드
                     returnIntent.putExtra("result", "ok");
                     setResult(5, returnIntent);
                     finish();
