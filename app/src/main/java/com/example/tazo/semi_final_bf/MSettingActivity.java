@@ -42,7 +42,7 @@ public class MSettingActivity extends Activity implements TextToSpeech.OnInitLis
         @Override
         public void onDone(String utteranceId) {
             if(exit) {
-                Intent returnIntent = new Intent();
+                Intent returnIntent = new Intent(MSettingActivity.this, MainActivity.class);
                 returnIntent.putExtra("result","ok");
                 setResult(2, returnIntent);
                 finish();
@@ -62,6 +62,7 @@ public class MSettingActivity extends Activity implements TextToSpeech.OnInitLis
 
         listView = (ListView)findViewById(R.id.setting_listview);
         adapter = new ArrayAdapter(getApplicationContext(), R.layout.row);
+        adapter.add("설정 취소");
         adapter.add("컨트롤러 모드");
         adapter.add("격자 무늬 모드");
         listView.setAdapter(adapter);
@@ -86,12 +87,17 @@ public class MSettingActivity extends Activity implements TextToSpeech.OnInitLis
 
                 switch (position) {
                     case 0:
+                        start = "설정을 취소합니다. 메인 화면으로 돌아갑니다.";
+                        onInit(1);
+                        exit = true;
+                        break;
+                    case 1:
                         // 4 : 컨트롤러 모드
                         returnIntent.putExtra("result", "ok");
                         setResult(4, returnIntent);
                         finish();
                         break;
-                    case 1:
+                    case 2:
                         // 5 : 격자 무늬 모드
                         returnIntent.putExtra("result", "ok");
                         setResult(5, returnIntent);
@@ -135,12 +141,18 @@ public class MSettingActivity extends Activity implements TextToSpeech.OnInitLis
             @Override
             public boolean onDoubleTap(int i) {
                 Intent returnIntent = new Intent();
-                if (keyPosition == 0) {
+                if(keyPosition == 0) {
+                    returnIntent = new Intent();
+                    returnIntent.putExtra("result","ok");
+                    setResult(2, returnIntent);
+                    finish();
+                }
+                else if (keyPosition == 1) {
                     // 0 : 컨트롤러 모드
                     returnIntent.putExtra("result", "ok");
                     setResult(4, returnIntent);
                     finish();
-                } else if (keyPosition == 1) {
+                } else if (keyPosition == 2) {
                     // 1 : 바둑판 모드
                     returnIntent.putExtra("result", "ok");
                     setResult(5, returnIntent);

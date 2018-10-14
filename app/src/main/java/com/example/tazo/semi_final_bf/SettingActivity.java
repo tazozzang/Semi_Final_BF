@@ -233,12 +233,18 @@ public class SettingActivity extends Activity implements TextToSpeech.OnInitList
             }
         }else if(requestCode == 4) {
             // 모드 변경 후 돌아온 곳
-            if(resultCode == 4) {
+            if(resultCode == 2) {
+                Intent returnIntent = new Intent(getApplication(), MainActivity.class);
+                returnIntent.putExtra("result",2);
+                setResult(2, returnIntent);
+                finish();
+            }
+            else if(resultCode == 4) {
                 Intent returnIntent = new Intent();
                 setResult(4, returnIntent);
                 finish();
             }
-            if(resultCode == 5) {
+            else if(resultCode == 5) {
                 Intent returnIntent = new Intent();
                 setResult(5, returnIntent);
                 finish();

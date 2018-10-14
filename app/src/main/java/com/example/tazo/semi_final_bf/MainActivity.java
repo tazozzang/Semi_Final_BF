@@ -283,7 +283,7 @@ GoogleApiClient.OnConnectionFailedListener{
                 v.vibrate(cpattern3, -1);
             }
             if(resultCode == REQUEST_RETURN) {
-                tts.speak("메인 화면에 진입하였습니다.",TextToSpeech.QUEUE_FLUSH,null);
+                tts.speak("메인 화면에 진입하였습니다.",TextToSpeech.QUEUE_ADD,null);
                 v.vibrate(cpattern3,-1);
             }
             if(resultCode == REQUEST_CONTROLLER_MODE) {
@@ -299,12 +299,12 @@ GoogleApiClient.OnConnectionFailedListener{
                 }
             }
             if(resultCode == REQUEST_GRID_MODE) {
-                // resultCode == 5 : 바둑판 모드 변경했을 때 적용해야 될 부분
+                // resultCode == 5 : 격자 무늬 모드 변경했을 때 적용해야 될 부분
                 view_mode = 5;
                 int result = db_handler.updateMode(view_mode);
                 if(result != -1) {
                     setContentView(R.layout.activity_grid_main);
-                    tts.speak("메인 화면에 진입하였습니다. 격자 모드로 변경되었습니다.", TextToSpeech.QUEUE_FLUSH, null);
+                    tts.speak("메인 화면에 진입하였습니다. 격자 모드로 변경되었습니다.", TextToSpeech.QUEUE_ADD, null);
                     v.vibrate(cpattern3, -1);
 
                     GridList.add(findViewById(R.id.oneone));
@@ -378,8 +378,7 @@ GoogleApiClient.OnConnectionFailedListener{
                 if(isThereTSwipe) {
                     isThereTSwipe = false;
                 }
-                else if (tx - sx > SWIPE_MIN_DISTANCE && Math.abs(tx - sx) > SWIPE_THRESHOLD_VELOCITY) {
-                    if(view_mode == 5 && FingerNum == 1) {
+                else if(tx - sx > SWIPE_MIN_DISTANCE && Math.abs(tx - sx) > SWIPE_THRESHOLD_VELOCITY && FingerNum == 1 && view_mode == 5) {
                         // Single Swipe Right => 오른쪽으로 포커스 이동
                         isThereSSwipe = true;
                         if (focusedNum + 1 < 9) {
@@ -409,39 +408,34 @@ GoogleApiClient.OnConnectionFailedListener{
                                 v.vibrate(cpattern3, -1);
                             }
                         }
-                    }
-                }
-                // right to left
-                else if (sx - tx > SWIPE_MIN_DISTANCE && Math.abs(sx - tx) > SWIPE_THRESHOLD_VELOCITY) {
-                    if(view_mode == 5 && FingerNum == 1) {
-                        // Single Swipe Left => 왼쪽으로 포커스 이동
-                        isThereSSwipe = true;
-                        if (focusedNum - 1 >= 0) {
-                            focusedNum = focusedNum - 1;
+                }else if(sx - tx > SWIPE_MIN_DISTANCE && Math.abs(sx - tx) > SWIPE_THRESHOLD_VELOCITY && FingerNum == 1 && view_mode == 5) {
+                    // Single Swipe Left => 왼쪽으로 포커스 이동
+                    isThereSSwipe = true;
+                    if (focusedNum - 1 >= 0) {
+                        focusedNum = focusedNum - 1;
+                        focusedName = gridSetting.getGridIconName(gridIndex + focusedNum, focusedNum, true);
+                        focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum, gridIndex);
+                        tts.speak(focusedName, TextToSpeech.QUEUE_FLUSH, null);
+                    } else {
+                        // 이전 페이지로 이동
+                        if(gridIndex - 8 >= 0) {
+                            if(gridIndex == 8) {
+                                gridIndex = 0;
+                            }else {
+                                gridIndex = gridIndex - 9;
+                            }
+                            gridSetting.setGrid(this, gridIndex, GridList);
+                            focusedNum = 8;
                             focusedName = gridSetting.getGridIconName(gridIndex + focusedNum, focusedNum, true);
                             focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum, gridIndex);
-                            tts.speak(focusedName, TextToSpeech.QUEUE_FLUSH, null);
-                        } else {
-                            // 이전 페이지로 이동
-                            if(gridIndex - 8 >= 0) {
-                                if(gridIndex == 8) {
-                                    gridIndex = 0;
-                                }else {
-                                    gridIndex = gridIndex - 9;
-                                }
-                                gridSetting.setGrid(this, gridIndex, GridList);
-                                focusedNum = 8;
-                                focusedName = gridSetting.getGridIconName(gridIndex + focusedNum, focusedNum, true);
-                                focusedPName = gridSetting.getGridIconPName(gridIndex + focusedNum, gridIndex);
-                                tts.speak("이전 페이지로 이동했습니다.", TextToSpeech.QUEUE_ADD, null);
-                                tts.speak(focusedName, TextToSpeech.QUEUE_ADD, null);
-                                v.vibrate(cpattern3, -1);
-                            }else {
-                                Toast.makeText(this, "첫 번째 페이지입니다.",Toast.LENGTH_SHORT).show();
-                                tts.speak("첫 번째 페이지입니다.", TextToSpeech.QUEUE_ADD, null);
-                                tts.speak(focusedName, TextToSpeech.QUEUE_ADD, null);
-                                v.vibrate(cpattern3, -1);
-                            }
+                            tts.speak("이전 페이지로 이동했습니다.", TextToSpeech.QUEUE_ADD, null);
+                            tts.speak(focusedName, TextToSpeech.QUEUE_ADD, null);
+                            v.vibrate(cpattern3, -1);
+                        }else {
+                            Toast.makeText(this, "첫 번째 페이지입니다.",Toast.LENGTH_SHORT).show();
+                            tts.speak("첫 번째 페이지입니다.", TextToSpeech.QUEUE_ADD, null);
+                            tts.speak(focusedName, TextToSpeech.QUEUE_ADD, null);
+                            v.vibrate(cpattern3, -1);
                         }
                     }
                 }
@@ -542,13 +536,14 @@ GoogleApiClient.OnConnectionFailedListener{
                 clickCount = 0;
                 if (e.getPointerCount() == 2) {
                     String alertmsg = "컨트롤러가 없습니다. 생성하려면 더블 탭";
-
                     // right to left swipe (오른쪽)
                     if (startX - stopX > SWIPE_MIN_DISTANCE && Math.abs(startX - stopX) > SWIPE_THRESHOLD_VELOCITY) {
                         if(view_mode == 4) {
                             if (controllerNum == 1) {
                                 Toast.makeText(context, alertmsg, Toast.LENGTH_SHORT).show();
-                                tts.speak(alertmsg, TextToSpeech.QUEUE_FLUSH, null);
+                                if(view_mode == 4) {
+                                    tts.speak("컨트롤러가 없습니다. 생성하려면 더블 탭해주세요.", TextToSpeech.QUEUE_ADD, null);
+                                }
                             } else {
                                 currentController = (currentController + 1) % controllerNum;
                                 if (currentController == 0) {
@@ -605,11 +600,11 @@ GoogleApiClient.OnConnectionFailedListener{
                             }
                             int forspeak = currentController + 1;
                             if (forspeak == 1) {
-                                tts.speak("첫번째", TextToSpeech.QUEUE_FLUSH, null);
+                                tts.speak("첫번째", TextToSpeech.QUEUE_ADD, null);
                             } else if (forspeak == 2) {
-                                tts.speak("두번째", TextToSpeech.QUEUE_FLUSH, null);
+                                tts.speak("두번째", TextToSpeech.QUEUE_ADD, null);
                             } else if (forspeak == 3) {
-                                tts.speak("세번째", TextToSpeech.QUEUE_FLUSH, null);
+                                tts.speak("세번째", TextToSpeech.QUEUE_ADD, null);
                             }
                         }
                         if(view_mode == 5) {
