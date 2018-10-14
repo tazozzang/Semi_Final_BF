@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -477,6 +479,8 @@ GoogleApiClient.OnConnectionFailedListener{
                             if (duration <= 1000) { // ** 값 조정 필요
                                 if (view_mode == 4) {
                                     // Double Tap
+                                    // 중앙에 위치한 앱 아이콘 삭제 효과
+                                    appImage.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
                                     if (controllerNum < 3) {
                                         controllers[controllerNum] = new Controller(getApplicationContext(), controllerNum + 1);
                                         controllerNum++;
@@ -539,6 +543,8 @@ GoogleApiClient.OnConnectionFailedListener{
                     // right to left swipe (오른쪽)
                     if (startX - stopX > SWIPE_MIN_DISTANCE && Math.abs(startX - stopX) > SWIPE_THRESHOLD_VELOCITY) {
                         if(view_mode == 4) {
+                            // 중앙에 위치한 앱 아이콘 삭제 효과
+                            appImage.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
                             if (controllerNum == 1) {
                                 Toast.makeText(context, alertmsg, Toast.LENGTH_SHORT).show();
                                 if(view_mode == 4) {
@@ -552,11 +558,11 @@ GoogleApiClient.OnConnectionFailedListener{
                             }
                             int forspeak = currentController + 1;
                             if (forspeak == 1) {
-                                tts.speak("첫번째", TextToSpeech.QUEUE_FLUSH, null);
+                                tts.speak("첫번째", TextToSpeech.QUEUE_ADD, null);
                             } else if (forspeak == 2) {
-                                tts.speak("두번째", TextToSpeech.QUEUE_FLUSH, null);
+                                tts.speak("두번째", TextToSpeech.QUEUE_ADD, null);
                             } else if (forspeak == 3) {
-                                tts.speak("세번째", TextToSpeech.QUEUE_FLUSH, null);
+                                tts.speak("세번째", TextToSpeech.QUEUE_ADD, null);
                             }
                         }
                         if(view_mode == 5) {
@@ -584,6 +590,8 @@ GoogleApiClient.OnConnectionFailedListener{
                     // left to right swipe (왼쪽)
                     else if (stopX - startX > SWIPE_MIN_DISTANCE && Math.abs(stopX - startX) > SWIPE_THRESHOLD_VELOCITY) {
                         if(view_mode == 4) {
+                            // 중앙에 위치한 앱 아이콘 삭제 효과
+                            appImage.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
                             if (controllerNum == 1) {
                                 Toast.makeText(context, alertmsg, Toast.LENGTH_SHORT).show();
                                 tts.speak(alertmsg, TextToSpeech.QUEUE_FLUSH, null);
@@ -635,6 +643,8 @@ GoogleApiClient.OnConnectionFailedListener{
                         String settinmsg = "설정 메뉴로 진입합니다.";
                         Toast.makeText(context, settinmsg, Toast.LENGTH_SHORT).show();
                         tts.speak(settinmsg, TextToSpeech.QUEUE_FLUSH, null);
+                        // 중앙에 위치한 앱 아이콘 삭제 효과
+                        appImage.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
                         Intent intent = new Intent(context, SettingActivity.class);
                         startActivityForResult(intent, REQUEST_CHANGE);
                         //finish();
@@ -645,6 +655,8 @@ GoogleApiClient.OnConnectionFailedListener{
                         String makeAlarm = "알람 만들기 진입합니다.";
                         Toast.makeText(context, "Make Alarm", Toast.LENGTH_SHORT).show();
                         tts.speak(makeAlarm, TextToSpeech.QUEUE_ADD, null);
+                        // 중앙에 위치한 앱 아이콘 삭제 효과
+                        appImage.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
                         Intent intent = new Intent(context, MakeAlarm.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                         startActivity(intent);
@@ -690,47 +702,46 @@ GoogleApiClient.OnConnectionFailedListener{
 
         if (theta <= 60 && theta >= 60 - 5) {
             //if(controllers[currentController].icon1 != null) {
-            // 아이콘이 설정된 것이 없으면 진동도 안울리게 했음.
-            v.vibrate(150);
-            controllers[currentController].flaggingIcon(0);
-            appImage.setImageDrawable(controllers[currentController].getIconImage(1));
-            tts.speak(controllers[currentController].icon1Name,TextToSpeech.QUEUE_FLUSH, null);
+                // 아이콘이 설정된 것이 없으면 진동도 안울리게 했음.
+                v.vibrate(150);
+                controllers[currentController].flaggingIcon(0);
+                appImage.setImageDrawable(controllers[currentController].getIconImage(1));
+                tts.speak(controllers[currentController].icon1Name,TextToSpeech.QUEUE_FLUSH, null);
             //}
         }
         if (theta <= 120 && theta >= 120 - 5) {
             //if(controllers[currentController].icon2 != null) {
-
-            v.vibrate(150);
-            controllers[currentController].flaggingIcon(1);
-            appImage.setImageDrawable(controllers[currentController].getIconImage(2));
-            tts.speak(controllers[currentController].icon2Name,TextToSpeech.QUEUE_FLUSH, null);
+                v.vibrate(150);
+                controllers[currentController].flaggingIcon(1);
+                appImage.setImageDrawable(controllers[currentController].getIconImage(2));
+                tts.speak(controllers[currentController].icon2Name,TextToSpeech.QUEUE_FLUSH, null);
             //}
         }
         // 세번째 앱
         if (theta <= 180 && theta >= 180 - 5) {
             //if(controllers[currentController].icon3 != null) {
-            v.vibrate(150);
-            controllers[currentController].flaggingIcon(2);
-            appImage.setImageDrawable(controllers[currentController].getIconImage(3));
-            tts.speak(controllers[currentController].icon3Name,TextToSpeech.QUEUE_FLUSH, null);
+                v.vibrate(150);
+                controllers[currentController].flaggingIcon(2);
+                appImage.setImageDrawable(controllers[currentController].getIconImage(3));
+                tts.speak(controllers[currentController].icon3Name,TextToSpeech.QUEUE_FLUSH, null);
             //}
         }
         // 네번째 앱
         if (theta <= -120 && theta >= -120 - 5) {
             //if(controllers[currentController].icon4 != null) {
-            v.vibrate(150);
-            controllers[currentController].flaggingIcon(3);
-            appImage.setImageDrawable(controllers[currentController].getIconImage(4));
-            tts.speak(controllers[currentController].icon4Name,TextToSpeech.QUEUE_FLUSH, null);
+                v.vibrate(150);
+                controllers[currentController].flaggingIcon(3);
+                appImage.setImageDrawable(controllers[currentController].getIconImage(4));
+                tts.speak(controllers[currentController].icon4Name,TextToSpeech.QUEUE_FLUSH, null);
             //}
         }
         // 다섯번째 앱
         if (theta <= -60 && theta >= -60 - 5) {
             //if(controllers[currentController].icon5 != null) {
-            v.vibrate(150);
-            controllers[currentController].flaggingIcon(4);
-            appImage.setImageDrawable(controllers[currentController].getIconImage(5));
-            tts.speak(controllers[currentController].icon5Name,TextToSpeech.QUEUE_FLUSH, null);
+                v.vibrate(150);
+                controllers[currentController].flaggingIcon(4);
+                appImage.setImageDrawable(controllers[currentController].getIconImage(5));
+                tts.speak(controllers[currentController].icon5Name,TextToSpeech.QUEUE_FLUSH, null);
             //}
         }
     }
