@@ -7,6 +7,7 @@ import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.wearable.view.WatchViewStub;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,7 +51,6 @@ GoogleApiClient.OnConnectionFailedListener,
                 .addOnConnectionFailedListener(this)
                 .build();
         //Toast.makeText(this,"hi",Toast.LENGTH_SHORT).show();
-
 
     }
 
@@ -140,6 +140,8 @@ GoogleApiClient.OnConnectionFailedListener,
         Toast.makeText(this,"peer dis",Toast.LENGTH_SHORT).show();
     }
 
+    public void OnClickModeButton(View v) {
 
+    }
 
 }
