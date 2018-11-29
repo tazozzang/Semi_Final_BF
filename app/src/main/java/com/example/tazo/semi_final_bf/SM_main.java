@@ -119,12 +119,20 @@ public class SM_main extends AppCompatActivity implements com.google.android.gms
             @Override
             public void onClick(View view) {
                 if (SSTsted == false) {
+
+                    String telling= "찾고자 하는 지명을 말씀해주세요";
+                    tts.speak(telling, TextToSpeech.QUEUE_FLUSH, null);
+                    while(tts.isSpeaking()) {
+                        // 말 끝나고 삐 하자~
+                    }
+
                     recognizer.startListening(i);
                     //Toast.makeText(view.getContext(),"시작",Toast.LENGTH_LONG).show();
                     SSTsted = true;
                     //Toast.makeText(getApplicationContext(), "여기까지 오긴 함1",Toast.LENGTH_SHORT).show();
 
                 } else {
+
                     recognizer.stopListening();
                     SSTsted = false;
                     //Toast.makeText(getApplicationContext(), "여기까지 오긴 함3",Toast.LENGTH_SHORT).show();
@@ -270,6 +278,12 @@ public class SM_main extends AppCompatActivity implements com.google.android.gms
             //Toast.makeText(getApplicationContext(), rs[0],Toast.LENGTH_SHORT).show();
             //Toast.makeText(getApplicationContext(), "여기까지 오긴 함2",Toast.LENGTH_SHORT).show();
             autocompleteFragment.setText("" + rs[0]);
+
+            String telling= "검색하신 지명의 이름이 " + rs[0] + "과 관련된 지명입니다.";
+            tts.speak(telling, TextToSpeech.QUEUE_FLUSH, null);
+            while(tts.isSpeaking()) {
+                // 말 끝나고 삐 하자~
+            }
 
         }
 

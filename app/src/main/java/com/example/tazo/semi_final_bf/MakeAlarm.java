@@ -12,6 +12,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
+import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -40,6 +42,8 @@ public class MakeAlarm extends AppCompatActivity  implements TextToSpeech.OnInit
     int t_o_d = 0, m = 0;
 
     LinearLayout linearLayout;
+    Button button;
+    Button cnt;
 
     TextToSpeech tts;
 
@@ -85,22 +89,23 @@ public class MakeAlarm extends AppCompatActivity  implements TextToSpeech.OnInit
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_UP:
                 if(timePicker.getCurrentMinute() >= 55){
-                    timePicker.setHour(timePicker.getCurrentHour() + 1);
+
+                    timePicker.setCurrentHour(timePicker.getCurrentHour() + 1);
                 }
                 m += 5;
                 String plus = m + "분 추가";
                 //Toast.makeText(getApplicationContext(), warningmsg,Toast.LENGTH_SHORT).show();
                 tts.speak(plus, TextToSpeech.QUEUE_FLUSH, null);
-                timePicker.setMinute(timePicker.getCurrentMinute() + 5);
+                timePicker.setCurrentMinute(timePicker.getCurrentMinute() + 5);
                 return true;
             case KeyEvent.KEYCODE_VOLUME_DOWN:
                 if(timePicker.getCurrentMinute() <= 4){
-                    timePicker.setHour(timePicker.getCurrentHour() - 1);
+                    timePicker.setCurrentHour(timePicker.getCurrentHour() - 1);
                 }
                 m -= 5;
                 String minus = m + "분 감소";
                 tts.speak(minus, TextToSpeech.QUEUE_FLUSH, null);
-                timePicker.setMinute(timePicker.getCurrentMinute() - 5);
+                timePicker.setCurrentMinute(timePicker.getCurrentMinute() - 5);
                 return true;
         }
         return super.onKeyDown(keyCode, event);
@@ -198,6 +203,27 @@ public class MakeAlarm extends AppCompatActivity  implements TextToSpeech.OnInit
 
         vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);;
         timePicker = (TimePicker) findViewById(R.id.timePicker);
+        button = (Button)findViewById(R.id.rmstop);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onGiveCancel();
+            }
+        });
+
+        cnt = (Button)findViewById(R.id.test);
+        cnt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PutDataMapRequest dataMapRequest = PutDataMapRequest.create("/GIVE_ALARM");
+                dataMapRequest.getDataMap().putLongArray("alarm",alarm_vib);
+
+                dataMapRequest.getDataMap().putInt("count",count++);
+                PutDataRequest request = dataMapRequest.asPutDataRequest();
+
+                Wearable.DataApi.putDataItem(googleApiClient,request).setResultCallback(resultCallback);
+            }
+        });
 
         mySfg = new SimpleFingerGestures();
         mySfg.setDebug(true);
@@ -217,10 +243,14 @@ public class MakeAlarm extends AppCompatActivity  implements TextToSpeech.OnInit
 
             @Override
             public boolean onSwipeDown(int fingers, long gestureDuration, double gestureDistance) {
-                    String setT = m + "분 후에 알람이 울립니다.";
+
+                onGiveAlarm();
+
+                String setT = m + "분 후에 알람이 울립니다.";
                     tts.speak(setT, TextToSpeech.QUEUE_FLUSH, null);
                     //Toast.makeText(getApplicationContext(), setT, Toast .LENGTH_SHORT).show();
                     new AlarmHATT(getApplicationContext()).Alarm(timePicker.getCurrentHour(), timePicker.getCurrentMinute());
+
                     finish();
                     overridePendingTransition(0,0); // finish animation 없애줌
 
@@ -274,9 +304,13 @@ public class MakeAlarm extends AppCompatActivity  implements TextToSpeech.OnInit
 
             PendingIntent sender = PendingIntent.getBroadcast(MakeAlarm.this, 0, intent, 0);
 
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),calendar.get(Calendar.DATE),time_of_day,minute,0);
-            alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),sender);
+            Calendar calendar = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                calendar = Calendar.getInstance();
+                calendar.set(calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),calendar.get(Calendar.DATE),time_of_day,minute,0);
+                alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),sender);
+            }
+
         }
     }
 }

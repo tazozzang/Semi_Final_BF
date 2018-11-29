@@ -95,7 +95,7 @@ GoogleApiClient.OnConnectionFailedListener,
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         for(DataEvent event:dataEventBuffer){
             if(event.getType() == DataEvent.TYPE_CHANGED){
-                Toast.makeText(this,"comein",Toast.LENGTH_SHORT).show();
+
                 String path = event.getDataItem().getUri().getPath();
 
                 if(path.equals("/KNOW_VIBE_PATH")){
@@ -115,7 +115,7 @@ GoogleApiClient.OnConnectionFailedListener,
                 if(path.equals("/GIVE_ALARM")){
                     DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
                     long[] take_alarm = dataMapItem.getDataMap().getLongArray("alarm");
-
+                    Toast.makeText(this,"알람 울리는 중",Toast.LENGTH_SHORT).show();
                     vibrator.vibrate(take_alarm,0);
                 }
                 if(path.equals("/STOP_ALARM")){
