@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:id="@+id/sm_main"
-    tools:context="com.example.tazo.semi_final_bf.SM_main">
+    tools:context=".SM_main">
 
     <Button
         android:layout_width="match_parent"

@@ -10,7 +10,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
     android:gravity="center"
-    tools:context="com.example.tazo.semi_final_bf.MainActivity">
+    tools:context=".MainActivity">
 
     <FrameLayout
         android:layout_width="match_parent"

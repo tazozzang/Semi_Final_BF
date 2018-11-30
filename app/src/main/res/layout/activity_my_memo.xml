@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:weightSum="1"
-    tools:context="com.example.tazo.semi_final_bf.MyMemoActivity">
+    tools:context=".MyMemoActivity">
 
     <LinearLayout
         android:layout_weight="0.6"

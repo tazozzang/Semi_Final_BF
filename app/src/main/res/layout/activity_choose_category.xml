@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.example.tazo.semi_final_bf.ChooseCategoryActivity">
+    tools:context=".ChooseCategoryActivity">
 
     <Button
         style="@style/ButtonStyle"

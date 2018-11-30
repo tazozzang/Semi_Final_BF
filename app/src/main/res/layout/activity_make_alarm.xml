@@ -11,7 +11,7 @@
     android:orientation="vertical"
     android:gravity="center"
     android:background="#00FFFFFF"
-    tools:context="com.example.tazo.semi_final_bf.MakeAlarm"
+    tools:context=".MakeAlarm"
     >
 
 

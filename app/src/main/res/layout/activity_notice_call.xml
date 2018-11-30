@@ -4,6 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.tazo.semi_final_bf.NoticeCALL">
+    tools:context="com.htwh.qring.NoticeCALL">
 
 </LinearLayout>

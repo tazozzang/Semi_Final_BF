@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:409921518976:android:0dd5349e2c1b5e50",
         "android_client_info": {
-          "package_name": "com.example.tazo.semi_final_bf"
+          "package_name": "com.htwh.qring"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "409921518976-17hs6vrmsmei3b0h5orqaa94nerbnm2s.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.tazo.semi_final_bf",
+            "package_name": "com.htwh.qring",
             "certificate_hash": "c3ee775541b23e228a833976bd17153577b3546a"
           }
         },
