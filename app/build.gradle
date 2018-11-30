@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 26
     defaultConfig {
-        applicationId "com.example.tazo.semi_final_bf"
+        applicationId 'com.htwh.qring'
         minSdkVersion 21
         targetSdkVersion 26
         versionCode 1
@@ -21,7 +21,8 @@ android {
         jumboMode true
         javaMaxHeapSize "4g"
     }
-
+    productFlavors {
+    }
 }
 
 dependencies {
